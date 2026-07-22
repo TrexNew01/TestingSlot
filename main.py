@@ -13,7 +13,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Database សម្រាប់រក្សាទុក Balance តាម Telegram User ID
 USER_BALANCES = {}
 
 class SlotEngine:
@@ -23,18 +22,20 @@ class SlotEngine:
         self.bet_amount = bet_amount
         self.symbols = ['WILD', 'BONUS', 'INGOT', 'ENVELOPE', 'PIXIU', 'LION', 'FISH', 'A', 'K', 'Q', 'J_10']
         
+        # 🎯 Paytable អាប់ដេតតាមរូបភាព (មូលដ្ឋាន Bet = $1.00)
         self.paytable = {
-            'INGOT':    {5: 5.0, 4: 1.5, 3: 0.5},
-            'ENVELOPE': {5: 4.0, 4: 1.2, 3: 0.4},
-            'PIXIU':    {5: 3.0, 4: 1.0, 3: 0.3},
-            'LION':     {5: 2.5, 4: 0.8, 3: 0.25},
-            'FISH':     {5: 2.0, 4: 0.6, 3: 0.2},
-            'A':        {5: 1.0, 4: 0.3, 3: 0.1},
-            'K':        {5: 1.0, 4: 0.3, 3: 0.1},
-            'Q':        {5: 0.8, 4: 0.2, 3: 0.08},
-            'J_10':     {5: 0.6, 4: 0.2, 3: 0.05},
+            'INGOT':    {5: 15.00, 4: 4.50, 3: 1.20},
+            'ENVELOPE': {5: 12.00, 4: 3.60, 3: 1.20},
+            'PIXIU':    {5: 9.00,  4: 2.70, 3: 0.90},
+            'LION':     {5: 7.50,  4: 2.10, 3: 0.90},
+            'FISH':     {5: 6.00,  4: 1.80, 3: 0.60},
+            'A':        {5: 3.00,  4: 0.90, 3: 0.30},
+            'K':        {5: 3.00,  4: 0.90, 3: 0.30},
+            'Q':        {5: 2.40,  4: 0.90, 3: 0.30},
+            'J_10':     {5: 1.80,  4: 0.90, 3: 0.30},
         }
 
+        # 5 Paylines ជួរដេក និងជួរអង្កត់ទ្រូង
         self.paylines = [
             [(0,1), (1,1), (2,1), (3,1), (4,1)],
             [(0,0), (1,0), (2,0), (3,0), (4,0)],
@@ -44,7 +45,7 @@ class SlotEngine:
         ]
 
     def generate_grid(self):
-        weights = [0.05, 0.05, 0.08, 0.08, 0.10, 0.10, 0.12, 0.12, 0.10, 0.10, 0.10]
+        weights = [0.04, 0.04, 0.06, 0.07, 0.08, 0.09, 0.12, 0.12, 0.12, 0.13, 0.13]
         return [[random.choices(self.symbols, weights=weights)[0] for _ in range(self.reel_height)] for _ in range(self.num_reels)]
 
     def evaluate(self, grid):
@@ -67,7 +68,9 @@ class SlotEngine:
                     break
 
             if target_sym in self.paytable and match_count in self.paytable[target_sym]:
-                total_win += self.paytable[target_sym][match_count] * (self.bet_amount / 5)
+                # គណនាប្រាក់ឈ្នះធៀបនឹង Bet Amount (សាមាត្រតាម Bet ជាក់ស្តែង)
+                base_win = self.paytable[target_sym][match_count]
+                total_win += base_win * (self.bet_amount / 1.00)
 
         return round(total_win, 2)
 
@@ -80,7 +83,6 @@ class DepositRequest(BaseModel):
     user_id: int
     amount: float = 10.00
 
-# Endpoint សម្រាប់បង្វិល Slot
 @app.post("/api/spin")
 async def spin_game(req: SpinRequest):
     if req.bet_amount < 0.10 or req.bet_amount > 10.00:
@@ -94,7 +96,7 @@ async def spin_game(req: SpinRequest):
     if current_balance < req.bet_amount:
         return {
             "status": "error",
-            "message": "ប្រាក់មិនគ្រប់គ្រាន់ទេ! សូមចុចប៊ូតុង 'ដាក់ប្រាក់' (Test Mode) ដើម្បីបន្ត។",
+            "message": "ប្រាក់មិនគ្រប់គ្រាន់ទេ! សូមចុចប៊ូតុង '➕ ដាក់ប្រាក់' (Testing) ដើម្បីបន្ត។",
             "balance": round(current_balance, 2)
         }
 
@@ -113,7 +115,6 @@ async def spin_game(req: SpinRequest):
         "balance": new_balance
     }
 
-# Endpoint សម្រាប់ Test ដាក់ប្រាក់
 @app.post("/api/deposit")
 async def test_deposit(req: DepositRequest):
     if req.user_id not in USER_BALANCES:
