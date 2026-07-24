@@ -24,6 +24,7 @@ ALLOWED_ORIGINS = [
     "http://127.0.0.1:5501",
     "http://localhost:8080",
     "https://trexnew01.github.io",  # 🌟 Frontend ជាក់ស្តែង (GitHub Pages, repo T-SPIN)
+    "https://t-spin-wy8g.onrender.com",  # 🌟 Frontend ជាក់ស្តែង (Render Static Site)
 ]
 
 app.add_middleware(
@@ -637,3 +638,4 @@ async def get_leaderboard():
         ]
     entries.sort(key=lambda e: e["best_win"], reverse=True)
     return {"leaderboard": entries[:LEADERBOARD_TOP_N]}
+    
