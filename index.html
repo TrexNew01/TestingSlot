@@ -1,359 +1,331 @@
 <!DOCTYPE html>
 <html lang="km">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dragon Slot - Premium</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <!-- សម្រាប់ Alert ស្អាតៗ -->
-    <style>
-        * { box-sizing: border-box; user-select: none; margin: 0; padding: 0; }
-        body {
-            background: #0b0302;
-            background-image: radial-gradient(circle at top, #260d07 0%, #050101 100%);
-            color: #fff;
-            font-family: 'Segoe UI', Roboto, sans-serif;
-            display: flex; flex-direction: column; align-items: center;
-            justify-content: center; min-height: 100vh; padding: 12px;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>T-Spin Studios - ជ្រើសរើសហ្គេម</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Noto+Sans+Khmer:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-deep:#050101;
+    --bg-warm:#260d07;
+    --gold:#ffd700;
+    --gold-dim:#b89b6a;
+    --jade:#2ecc71;
+    --crimson:#c0392b;
+    --card-bg:rgba(20,10,5,0.55);
+    --card-border:rgba(212,175,55,0.45);
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+  html,body{ height:100%; }
+  body{
+    background:var(--bg-deep);
+    background-image:
+      radial-gradient(circle at 50% -10%, #3a1408 0%, #170804 45%, #050101 100%);
+    color:#fff;
+    font-family:'Noto Sans Khmer','Segoe UI',Roboto,sans-serif;
+    min-height:100vh;
+    display:flex; flex-direction:column; align-items:center;
+    padding:28px 16px 40px;
+    overflow-x:hidden;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; }
+  }
 
-        /* Header Bar - Glassmorphism Style */
-        .user-card {
-            display: flex; align-items: center; justify-content: space-between;
-            width: 100%; max-width: 440px;
-            background: rgba(20, 20, 20, 0.4);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px; padding: 12px 16px; margin-bottom: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-        }
+  /* ---------- ambient embers (signature atmosphere, quiet) ---------- */
+  .ember{
+    position:fixed; bottom:-10px; width:3px; height:3px; border-radius:50%;
+    background:var(--gold); opacity:0; pointer-events:none;
+    box-shadow:0 0 6px 1px rgba(255,215,0,0.6);
+    animation:rise linear infinite;
+  }
+  @keyframes rise{
+    0%{ transform:translateY(0) translateX(0); opacity:0; }
+    10%{ opacity:.7; }
+    90%{ opacity:.5; }
+    100%{ transform:translateY(-100vh) translateX(var(--drift,20px)); opacity:0; }
+  }
 
-        .user-info { display: flex; align-items: center; gap: 12px; }
-        .user-avatar {
-            width: 42px; height: 42px; border-radius: 50%;
-            background: linear-gradient(135deg, #ffd700, #ff8c00);
-            display: flex; align-items: center; justify-content: center;
-            font-weight: bold; color: #000; font-size: 18px;
-        }
+  /* ---------- header ---------- */
+  .mascot-wrap{
+    width:160px; height:160px; margin-bottom:8px; position:relative;
+    filter:drop-shadow(0 6px 16px rgba(0,0,0,0.65));
+  }
+  /* 🌟 ពន្លឺទន់ៗពីក្រោយ logo ធ្វើឱ្យវាលេចធ្លោច្បាស់លើផ្ទៃងងឹត */
+  .mascot-wrap::before{
+    content:""; position:absolute; inset:-16px; z-index:-1;
+    background:radial-gradient(circle, rgba(255,215,0,0.22) 0%, rgba(255,215,0,0) 70%);
+  }
+  .mascot-wrap img{ width:100%; height:100%; object-fit:contain; }
 
-        .user-name { font-weight: 700; font-size: 14px; color: #fff; }
-        .user-id { font-size: 11px; color: #8a8a8a; }
+  .brand-eyebrow{
+    font-family:'Noto Sans Khmer'; font-size:12px; letter-spacing:2px; color:var(--gold-dim);
+    margin-bottom:2px;
+  }
+  h1.brand{
+    font-family:'Cinzel', serif; font-weight:700; font-size:30px; letter-spacing:4px;
+    color:var(--gold);
+    background:linear-gradient(180deg,#fff2b0 0%,#ffd700 45%,#a97a1f 100%);
+    -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+    text-shadow:0 2px 18px rgba(255,215,0,0.25);
+    margin-bottom:4px;
+  }
+  .brand-sub{
+    font-size:13px; color:#e8d9b8; opacity:0.85; text-align:center; max-width:320px;
+    margin-bottom:26px;
+  }
 
-        .balance-section {
-            display: flex; flex-direction: column; align-items: flex-end; gap: 6px;
-        }
+  /* ---------- game grid ---------- */
+  .grid{
+    width:100%; max-width:440px;
+    display:grid; grid-template-columns:1fr 1fr; gap:16px;
+  }
+  .grid .card:first-child{ grid-column:1 / -1; }
 
-        .balance-badge {
-            font-weight: bold; font-size: 18px; color: #2ecc71;
-            text-shadow: 0 0 10px rgba(46,204,113,0.3);
-        }
+  .card{
+    position:relative;
+    background:var(--card-bg);
+    backdrop-filter:blur(10px);
+    border:1px solid var(--card-border);
+    border-radius:18px;
+    padding:20px 14px 16px;
+    display:flex; flex-direction:column; align-items:center; text-align:center;
+    text-decoration:none; color:inherit;
+    transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+  }
+  .card:active{ transform:scale(0.97); }
+  .card.live{ cursor:pointer; }
+  .card.live:hover{ border-color:rgba(255,215,0,0.75); box-shadow:0 6px 24px rgba(255,215,0,0.15); }
 
-        .btn-deposit {
-            background: rgba(46, 204, 113, 0.2);
-            border: 1px solid #2ecc71; color: #2ecc71;
-            padding: 4px 10px; border-radius: 8px; font-size: 11px;
-            font-weight: bold; cursor: pointer; transition: 0.2s;
-        }
-        .btn-deposit:active { transform: scale(0.9); background: #2ecc71; color: #000; }
+  /* the tassel cord — small signature nod to the envelope/bonus icon set */
+  .cord{
+    position:absolute; top:-9px; width:2px; height:16px;
+    background:linear-gradient(var(--crimson), transparent);
+  }
 
-        /* Premium Slot Frame */
-        .slot-frame {
-            background: linear-gradient(180deg, #3d1409 0%, #120402 100%);
-            border: 3px solid #d4af37; border-radius: 16px; padding: 10px;
-            width: 100%; max-width: 440px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9);
-        }
+  /* octagonal moon-gate medallion, echoing the symbol-icon bezel */
+  .medallion{
+    --size:84px;
+    width:var(--size); height:var(--size); margin-bottom:12px;
+    position:relative;
+    clip-path:polygon(29% 0,71% 0,100% 29%,100% 71%,71% 100%,29% 100%,0 71%,0 29%);
+    background:linear-gradient(160deg,#3a2410,#150a04);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:inset 0 0 0 2px rgba(255,215,0,0.55), 0 3px 10px rgba(0,0,0,0.5);
+  }
+  .medallion img{ width:62%; height:62%; object-fit:contain; }
+  .medallion .lock{ font-size:26px; opacity:0.55; filter:grayscale(1); }
 
-        .reels-container {
-            display: flex; gap: 6px; background: #050202;
-            padding: 8px; border-radius: 12px; border: 2px solid #5c2415;
-        }
+  .card.soon .medallion{
+    box-shadow:inset 0 0 0 2px rgba(184,155,106,0.35), 0 3px 10px rgba(0,0,0,0.5);
+    filter:saturate(0.35) brightness(0.75);
+  }
 
-        .reel {
-            flex: 1; display: flex; flex-direction: column; gap: 6px;
-        }
+  .card-title{ font-weight:700; font-size:14.5px; letter-spacing:0.3px; margin-bottom:2px; }
+  .card-title.small{ font-size:13px; }
+  .card-tag{ font-size:10.5px; color:var(--gold-dim); margin-bottom:12px; }
 
-        .symbol-box {
-            width: 100%; height: 70px;
-            background: #121010; border-radius: 8px;
-            display: flex; align-items: center; justify-content: center;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
+  .play-btn{
+    width:100%; padding:9px 0; border-radius:10px; border:none;
+    font-weight:800; font-size:12.5px; letter-spacing:0.4px;
+    background:linear-gradient(180deg,#ffe066,#d4a017); color:#2a1600;
+    box-shadow:0 3px 10px rgba(212,160,23,0.35);
+  }
+  .soon-badge{
+    width:100%; padding:9px 0; border-radius:10px;
+    font-weight:700; font-size:11px; letter-spacing:0.4px;
+    background:rgba(255,255,255,0.05); color:var(--gold-dim);
+    border:1px dashed rgba(184,155,106,0.4);
+  }
 
-        .symbol-img { max-width: 80%; max-height: 80%; object-fit: contain; }
+  /* subtle rotating sheen sweep across the live medallion */
+  .medallion.sheen::after{
+    content:""; position:absolute; inset:0;
+    background:conic-gradient(from 0deg, transparent 0 80%, rgba(255,255,255,0.35) 88%, transparent 96%);
+    animation:sweep 5s linear infinite;
+    mix-blend-mode:overlay;
+  }
+  @keyframes sweep{ to{ transform:rotate(360deg); } }
 
-        /* 🌀 Animations */
-        .reel.spinning .symbol-box { animation: blurVertical 0.1s infinite linear; }
-        @keyframes blurVertical {
-            0% { transform: translateY(-5px); filter: blur(2px); }
-            50% { transform: translateY(5px); filter: blur(2px); }
-            100% { transform: translateY(-5px); filter: blur(2px); }
-        }
+  footer{
+    margin-top:30px; font-size:10.5px; color:var(--gold-dim); opacity:0.6; letter-spacing:0.3px;
+  }
 
-        .win-glow {
-            border-color: #ffd700 !important;
-            box-shadow: inset 0 0 15px rgba(255, 215, 0, 0.5) !important;
-        }
+  /* ---------- slot-reel loading overlay ---------- */
+  .loader-overlay{
+    position:fixed; inset:0; z-index:999;
+    background:radial-gradient(circle at 50% 40%, #2a0f06 0%, #0a0302 65%, #050101 100%);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    opacity:0; pointer-events:none;
+    transition:opacity .25s ease;
+  }
+  .loader-overlay.show{ opacity:1; pointer-events:all; }
 
-        /* Controls Area */
-        .controls {
-            width: 100%; max-width: 440px; margin-top: 15px;
-            display: flex; flex-direction: column; gap: 12px;
-        }
+  .loader-title{
+    font-family:'Cinzel', serif; font-weight:700; font-size:15px; letter-spacing:3px;
+    color:var(--gold); margin-bottom:22px; text-transform:uppercase;
+    text-shadow:0 2px 14px rgba(255,215,0,0.35);
+  }
 
-        .dashboard-bar {
-            display: flex; justify-content: space-between; gap: 10px;
-        }
+  .reels{
+    display:flex; gap:10px; margin-bottom:26px;
+    padding:12px; border-radius:14px;
+    background:linear-gradient(160deg,#3a2410,#150a04);
+    box-shadow:inset 0 0 0 2px rgba(255,215,0,0.5), 0 8px 24px rgba(0,0,0,0.6);
+  }
+  .reel{
+    width:52px; height:52px; border-radius:8px; overflow:hidden;
+    background:#0d0603;
+    box-shadow:inset 0 0 0 1px rgba(255,215,0,0.25);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .reel img{ width:70%; height:70%; object-fit:contain; animation:spin-symbol .18s linear infinite; }
+  .reel:nth-child(2) img{ animation-delay:.06s; }
+  .reel:nth-child(3) img{ animation-delay:.12s; }
+  @keyframes spin-symbol{
+    0%{ transform:translateY(-60%); opacity:0; }
+    50%{ transform:translateY(0); opacity:1; }
+    100%{ transform:translateY(60%); opacity:0; }
+  }
 
-        .bet-box, .win-box {
-            flex: 1; background: rgba(30, 10, 5, 0.8);
-            border: 1px solid #8b5a2b; border-radius: 12px;
-            padding: 8px; display: flex; align-items: center; justify-content: space-between;
-        }
-
-        .win-box { justify-content: center; flex-direction: column; }
-        .win-label { font-size: 10px; color: #ffd700; letter-spacing: 1px; }
-        .win-amount { font-size: 18px; font-weight: bold; color: #fff; }
-        .win-amount.is-win { color: #2ecc71; text-shadow: 0 0 10px rgba(46,204,113,0.5); }
-
-        .btn-bet {
-            background: #4a280f; color: #fff; border: 1px solid #8b5a2b;
-            width: 32px; height: 32px; border-radius: 50%;
-            font-size: 18px; font-weight: bold; cursor: pointer;
-        }
-        .btn-bet:active { transform: scale(0.9); }
-
-        .spin-btn {
-            background: linear-gradient(180deg, #ffe066, #f39c12, #b33900);
-            border: none; color: #000; font-size: 22px; font-weight: 900;
-            padding: 14px; border-radius: 30px; cursor: pointer;
-            box-shadow: 0 6px 15px rgba(243, 156, 18, 0.4); text-transform: uppercase;
-        }
-        .spin-btn:active { transform: scale(0.96); }
-        .spin-btn:disabled { opacity: 0.5; filter: grayscale(1); }
-
-        .alert-box { color: #e74c3c; font-size: 13px; text-align: center; min-height: 20px; }
-    </style>
+  .loader-bar-track{
+    width:200px; height:6px; border-radius:6px; overflow:hidden;
+    background:rgba(255,255,255,0.08);
+    box-shadow:inset 0 0 0 1px rgba(212,175,55,0.3);
+  }
+  .loader-bar-fill{
+    height:100%; width:0%; border-radius:6px;
+    background:linear-gradient(90deg,#ffe066,#d4a017);
+    transition:width .1s linear;
+  }
+  .loader-hint{ margin-top:14px; font-size:11.5px; color:var(--gold-dim); letter-spacing:0.3px; }
+</style>
 </head>
 <body>
 
-    <div class="user-card">
-        <div class="user-info">
-            <div class="user-avatar" id="u-avatar">?</div>
-            <div class="user-details">
-                <span class="user-name" id="u-name">Loading...</span>
-                <span class="user-id" id="u-id">ID: -----</span>
-            </div>
-        </div>
-        <div class="balance-section">
-            <div class="balance-badge" id="balance-display">$10.00</div>
-            <button class="btn-deposit" onclick="testDeposit()">➕ ដាក់ប្រាក់</button>
-        </div>
+  <div class="mascot-wrap"><img src="T-spinLogo.png" alt=""></div>
+  <div class="brand-eyebrow">✦ FORTUNE HALL ✦</div>
+  <h1 class="brand">T-Spin Studios</h1>
+  <div class="brand-sub">ជ្រើសរើសហ្គេមដែលអ្នកចង់លេង — ហ្គេមថ្មីៗនឹងបន្ថែមនៅទីនេះឆាប់ៗនេះ</div>
+
+  <div class="grid" id="game-grid"></div>
+
+  <footer>T-Spin Studios © 2026</footer>
+
+  <div class="loader-overlay" id="loader-overlay">
+    <div class="loader-title" id="loader-title">កំពុងផ្ទុកហ្គេម...</div>
+    <div class="reels">
+      <div class="reel"><img src="INGOT.png" alt=""></div>
+      <div class="reel"><img src="LION.png" alt=""></div>
+      <div class="reel"><img src="PIXIU.png" alt=""></div>
     </div>
+    <div class="loader-bar-track"><div class="loader-bar-fill" id="loader-bar"></div></div>
+    <div class="loader-hint">សូមរង់ចាំបន្តិច</div>
+  </div>
 
-    <div class="slot-frame">
-        <div class="reels-container" id="slot-grid">
-            <div class="reel" id="reel-0"></div>
-            <div class="reel" id="reel-1"></div>
-            <div class="reel" id="reel-2"></div>
-            <div class="reel" id="reel-3"></div>
-            <div class="reel" id="reel-4"></div>
-        </div>
-    </div>
+<script>
+  // ✦ បញ្ជីហ្គេម — បន្ថែម object ថ្មីមួយនៅទីនេះរាល់ពេលមានហ្គេមថ្មី
+  // status: "live" = អាចលេងបាន, "soon" = មកដល់ឆាប់ៗ (medallion បង្ហាញជា lock)
+  const GAMES = [
+    {
+      id: "golden-dragon-fortune",
+      title: "Golden Dragon Fortune",
+      tag: "Premium Fortune Slot · 5×3",
+      icon: "GoldenDragon.png",
+      status: "live",
+      url: "Golden_Dragon_Fortune.html"
+    },
+    {
+      id: "coming-1",
+      title: "?",
+      tag: "មកដល់ឆាប់ៗ",
+      status: "soon"
+    },
+    {
+      id: "coming-2",
+      title: "?",
+      tag: "មកដល់ឆាប់ៗ",
+      status: "soon"
+    }
+  ];
 
-    <div class="controls">
-        <div class="dashboard-bar">
-            <div class="bet-box">
-                <button class="btn-bet" onclick="changeBet(-0.10)">-</button>
-                <div style="text-align: center;">
-                    <div style="font-size: 10px; color: #aaa;">TOTAL BET</div>
-                    <div id="bet-display" style="font-size: 16px; font-weight: bold; color: #ffd700;">$0.10</div>
-                </div>
-                <button class="btn-bet" onclick="changeBet(0.10)">+</button>
-            </div>
-            
-            <div class="win-box">
-                <span class="win-label">WIN</span>
-                <span class="win-amount" id="win-display">$0.00</span>
-            </div>
-        </div>
+  const grid = document.getElementById("game-grid");
 
-        <button class="spin-btn" id="spin-btn" onclick="spin()">SPIN</button>
-        <div class="alert-box" id="alert-msg"></div>
-    </div>
+  GAMES.forEach(game => {
+    const isLive = game.status === "live";
+    const el = document.createElement(isLive ? "a" : "div");
+    el.className = "card " + (isLive ? "live" : "soon");
+    if (isLive) el.href = game.url;
 
-    <script>
-        const API_URL = 'http://127.0.0.1:8000/api';
-        const tg = window.Telegram?.WebApp;
-        let userBalance = 10.00;
-        let currentBet = 0.10;
-        let isSpinning = false;
+    el.innerHTML = `
+      <span class="cord"></span>
+      <div class="medallion ${isLive ? "sheen" : ""}">
+        ${isLive
+          ? `<img src="${game.icon}" alt="${game.title}">`
+          : `<span class="lock">🔒</span>`}
+      </div>
+      <div class="card-title ${isLive ? "" : "small"}">${game.title}</div>
+      <div class="card-tag">${game.tag}</div>
+      ${isLive
+        ? `<span class="play-btn">លេងឥឡូវ</span>`
+        : `<span class="soon-badge">COMING SOON</span>`}
+    `;
 
-        let userData = { id: 123456, first_name: "Trex User", username: "trex_user" };
+    if (isLive) {
+      el.addEventListener("click", (e) => {
+        e.preventDefault();
+        playLoaderThenGo(game);
+      });
+    }
 
-        if (tg) {
-            tg.expand(); tg.ready();
-            if (tg.initDataUnsafe?.user) userData = tg.initDataUnsafe.user;
-        }
+    grid.appendChild(el);
+  });
 
-        document.getElementById('u-name').innerText = userData.first_name;
-        document.getElementById('u-id').innerText = `ID: ${userData.id}`;
-        document.getElementById('u-avatar').innerText = userData.first_name.charAt(0).toUpperCase();
+  // ✦ ចាក់ animation slot-reel រហូតដល់ 100% រួចទើប navigate ទៅហ្គេម
+  function playLoaderThenGo(game) {
+    const overlay = document.getElementById("loader-overlay");
+    const bar = document.getElementById("loader-bar");
+    const title = document.getElementById("loader-title");
+    title.textContent = `កំពុងផ្ទុក ${game.title}...`;
+    bar.style.width = "0%";
+    overlay.classList.add("show");
 
-        const symbolImages = {
-            'WILD': 'https://img.icons8.com/emoji/96/dragon-face-emoji.png',
-            'BONUS': 'https://img.icons8.com/color/96/gold-bars.png',
-            'INGOT': 'INGOT.png',
-            'ENVELOPE': 'ENVELOPE.png',
-            'PIXIU': 'PIXIU.png',
-            'LION': 'https://img.icons8.com/color/96/tiger-face.png',
-            'FISH': 'https://img.icons8.com/color/96/koi-fish.png',
-            'A': 'https://img.icons8.com/color-glass/96/letter-a.png',
-            'K': 'https://img.icons8.com/color-glass/96/letter-k.png',
-            'Q': 'https://img.icons8.com/color-glass/96/letter-q.png',
-            'J_10': 'https://img.icons8.com/color-glass/96/letter-j.png'
-        };
-        const allSymbols = Object.keys(symbolImages);
+    let progress = 0;
+    const totalDuration = 1300; // ms
+    const stepMs = 40;
+    const steps = totalDuration / stepMs;
+    const increment = 100 / steps;
 
-        function initGrid() {
-            for (let i = 0; i < 5; i++) {
-                const reel = document.getElementById(`reel-${i}`);
-                reel.innerHTML = '';
-                for (let j = 0; j < 3; j++) {
-                    const box = document.createElement('div');
-                    box.className = 'symbol-box';
-                    box.innerHTML = `<img class="symbol-img" src="${symbolImages['A']}">`;
-                    reel.appendChild(box);
-                }
-            }
-        }
-        initGrid();
+    const timer = setInterval(() => {
+      progress = Math.min(100, progress + increment);
+      bar.style.width = progress + "%";
+      if (progress >= 100) {
+        clearInterval(timer);
+        window.location.href = game.url;
+      }
+    }, stepMs);
+  }
 
-        function changeBet(step) {
-            if (isSpinning) return;
-            let newBet = Math.round((currentBet + step) * 100) / 100;
-            if (newBet >= 0.10 && newBet <= 10.00) {
-                currentBet = newBet;
-                document.getElementById('bet-display').innerText = `$${currentBet.toFixed(2)}`;
-            }
-        }
+  // ✦ ភ្លើងអង្គុលចេញពីបាតអេក្រង់ (ambient, light, respects reduced-motion via CSS)
+  const emberLayer = document.body;
+  for (let i = 0; i < 14; i++) {
+    const e = document.createElement("div");
+    e.className = "ember";
+    e.style.left = Math.random() * 100 + "vw";
+    e.style.setProperty("--drift", (Math.random() * 40 - 20) + "px");
+    e.style.animationDuration = (6 + Math.random() * 6) + "s";
+    e.style.animationDelay = (Math.random() * 8) + "s";
+    emberLayer.appendChild(e);
+  }
 
-        // មុខងារដាក់ប្រាក់ Test 
-        async function testDeposit() {
-            if (isSpinning) return;
-            
-            try {
-                const res = await fetch(`${API_URL}/deposit`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ user_id: userData.id, amount: 10.00 })
-                });
-                const data = await res.json();
-                
-                if(data.status === 'success') {
-                    userBalance = data.balance;
-                    document.getElementById('balance-display').innerText = `$${userBalance.toFixed(2)}`;
-                    
-                    // បង្ហាញ Alert ស្អាតៗ
-                    Swal.fire({
-                        title: 'ជោគជ័យ!',
-                        text: data.message,
-                        icon: 'success',
-                        confirmButtonColor: '#2ecc71',
-                        background: '#1a1a1a',
-                        color: '#fff'
-                    });
-                    document.getElementById('alert-msg').innerText = ''; // Clear error msg
-                }
-            } catch (err) {
-                console.error(err);
-            }
-        }
-
-        async function spin() {
-            const alertMsg = document.getElementById('alert-msg');
-            const winDisplay = document.getElementById('win-display');
-            alertMsg.innerText = "";
-            winDisplay.innerText = "$0.00";
-            winDisplay.classList.remove('is-win');
-
-            if (userBalance < currentBet) {
-                alertMsg.innerHTML = "❌ ប្រាក់មិនគ្រប់គ្រាន់ទេ! សូមចុច <b>➕ ដាក់ប្រាក់</b> ដើម្បីបន្ត (Test Mode)។";
-                return;
-            }
-
-            isSpinning = true;
-            document.getElementById('spin-btn').disabled = true;
-            document.querySelectorAll('.symbol-box').forEach(b => b.classList.remove('win-glow'));
-
-            const reels = document.querySelectorAll('.reel');
-            reels.forEach(r => r.classList.add('spinning'));
-
-            const spinInterval = setInterval(() => {
-                reels.forEach(reel => {
-                    const imgs = reel.querySelectorAll('.symbol-img');
-                    imgs.forEach(img => {
-                        img.src = symbolImages[allSymbols[Math.floor(Math.random() * allSymbols.length)]];
-                    });
-                });
-            }, 60);
-
-            try {
-                const response = await fetch(`${API_URL}/spin`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ user_id: userData.id, bet_amount: currentBet })
-                });
-                const data = await response.json();
-
-                if (data.status === "error") {
-                    clearInterval(spinInterval);
-                    reels.forEach(r => r.classList.remove('spinning'));
-                    alertMsg.innerHTML = `❌ ${data.message}`;
-                    document.getElementById('spin-btn').disabled = false;
-                    isSpinning = false;
-                    return;
-                }
-
-                setTimeout(() => {
-                    clearInterval(spinInterval);
-                    data.grid.forEach((reelSymbols, reelIndex) => {
-                        setTimeout(() => {
-                            const reelDiv = document.getElementById(`reel-${reelIndex}`);
-                            reelDiv.classList.remove('spinning');
-                            reelDiv.innerHTML = '';
-                            
-                            reelSymbols.forEach(symbol => {
-                                const box = document.createElement('div');
-                                box.className = 'symbol-box';
-                                if (data.total_win > 0) box.classList.add('win-glow');
-                                box.innerHTML = `<img class="symbol-img" src="${symbolImages[symbol]}">`;
-                                reelDiv.appendChild(box);
-                            });
-
-                            if (reelIndex === 4) {
-                                userBalance = data.balance;
-                                document.getElementById('balance-display').innerText = `$${userBalance.toFixed(2)}`;
-
-                                if (data.total_win > 0) {
-                                    winDisplay.innerText = `$${data.total_win.toFixed(2)}`;
-                                    winDisplay.classList.add('is-win');
-                                }
-                                document.getElementById('spin-btn').disabled = false;
-                                isSpinning = false;
-                            }
-                        }, reelIndex * 150);
-                    });
-                }, 500);
-
-            } catch (err) {
-                clearInterval(spinInterval);
-                reels.forEach(r => r.classList.remove('spinning'));
-                alertMsg.innerText = "⚠️ មិនអាចភ្ជាប់ទៅ Server ទេ!";
-                document.getElementById('spin-btn').disabled = false;
-                isSpinning = false;
-            }
-        }
-    </script>
+  // ✦ Telegram Web App — ពង្រីកទៅពេញអេក្រង់ដូច slot_game.html
+  if (window.Telegram && window.Telegram.WebApp) {
+    Telegram.WebApp.ready();
+    Telegram.WebApp.expand();
+  }
+</script>
 </body>
 </html>

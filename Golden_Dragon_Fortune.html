@@ -1,0 +1,1650 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Golden Dragon Fortune - Premium</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        * { box-sizing: border-box; user-select: none; margin: 0; padding: 0; }
+        body {
+            background: #0a0403; background-image: radial-gradient(circle at top, #260d07 0%, #050101 100%);
+            color: #fff; font-family: 'Segoe UI', Roboto, sans-serif;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 12px;
+        }
+
+        .game-logo-container { width: 100%; max-width: 440px; margin-bottom: 8px; display: flex; justify-content: center; align-items: center; gap: 10px; position: relative; }
+        .game-logo {
+            font-size: 28px; font-weight: 900; color: #ffd700; letter-spacing: 3px; position: relative; overflow: hidden;
+            padding: 8px 26px; border-radius: 20px; background: rgba(20, 10, 5, 0.6); backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 215, 0, 0.2); box-shadow: 0 4px 15px rgba(0,0,0,0.5), inset 0 0 10px rgba(255, 215, 0, 0.1);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .game-logo img { height: 34px; display: block; object-fit: contain; }
+        .home-btn {
+            position: fixed; top: 10px; left: 10px; width: 36px; height: 36px; border-radius: 50%; cursor: pointer;
+            background: rgba(20, 10, 5, 0.75); border: 1px solid rgba(255, 215, 0, 0.35); font-size: 16px;
+            display: flex; align-items: center; justify-content: center; color: #ffd700; z-index: 50;
+            text-decoration: none;
+        }
+        .icon-btn-group { position: absolute; top: 50%; transform: translateY(-50%); display: flex; align-items: center; gap: 6px; }
+        .icon-btn-group.left { left: 0; }
+        .icon-btn-group.right { right: 0; }
+        .icon-btn {
+            width: 32px; height: 32px; border-radius: 50%; cursor: pointer;
+            background: rgba(20, 10, 5, 0.6); border: 1px solid rgba(255, 215, 0, 0.3); font-size: 14px;
+            display: flex; align-items: center; justify-content: center; color: #ffd700; transition: 0.2s;
+        }
+        /* 🌟 សម្គាល់ toggle ដែលកំពុងបើក (Turbo/Mute) */
+        .icon-btn.active {
+            border-color: #ffd700; background: rgba(255, 215, 0, 0.22); box-shadow: 0 0 10px rgba(255, 215, 0, 0.45);
+        }
+        .session-badge {
+            width: 100%; max-width: 440px; text-align: center; font-size: 11px; color: #b89b6a;
+            margin-bottom: 10px; letter-spacing: 0.3px;
+        }
+
+        .user-card {
+            display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 440px;
+            background: rgba(20, 20, 20, 0.4); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px; padding: 12px 16px; margin-bottom: 15px;
+        }
+        .user-info { display: flex; align-items: center; gap: 12px; }
+        .user-avatar { width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, #ffd700, #ff8c00); display: flex; align-items: center; justify-content: center; font-weight: bold; color: #000; }
+        .user-name { font-weight: 700; font-size: 14px; }
+        .balance-section { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+        .balance-badge { font-weight: bold; font-size: 18px; color: #2ecc71; }
+        .wallet-actions { display: flex; gap: 6px; }
+        .wallet-btn {
+            font-size: 10px; font-weight: 800; padding: 5px 9px; border-radius: 8px; border: none;
+            cursor: pointer; letter-spacing: 0.2px;
+        }
+        .wallet-btn.deposit { background: #2ecc71; color: #063a1e; }
+        .wallet-btn.withdraw { background: #e74c3c; color: #fff; }
+        .wallet-btn:active { transform: scale(0.95); }
+
+        .slot-frame {
+            background: linear-gradient(180deg, rgba(61, 20, 9, 0.75) 0%, rgba(18, 4, 2, 0.85) 100%);
+            backdrop-filter: blur(15px) saturate(140%); -webkit-backdrop-filter: blur(15px) saturate(140%);
+            border: 1px solid rgba(212, 175, 55, 0.45); border-radius: 16px;
+            padding: 10px; width: 100%; max-width: 440px; position: relative; overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.12), inset 0 0 40px rgba(212, 175, 55, 0.06);
+            transition: background 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease;
+        }
+        /* 🌟 រូបរាងផ្សេងខណៈពេល Free Spins សកម្ម ដើម្បីឱ្យអ្នកលេងដឹងភ្លាមៗថាកំពុងលេង bonus round */
+        .slot-frame.free-spin-active {
+            background: linear-gradient(180deg, rgba(30, 12, 65, 0.8) 0%, rgba(8, 4, 24, 0.88) 100%);
+            border-color: rgba(138, 100, 255, 0.6);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 0 26px rgba(138, 100, 255, 0.35);
+            animation: freeSpinBreathe 2.4s ease-in-out infinite;
+        }
+        @keyframes freeSpinBreathe {
+            0%, 100% { box-shadow: 0 10px 30px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,255,255,0.12), 0 0 20px rgba(138,100,255,0.3); }
+            50%      { box-shadow: 0 10px 30px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,255,255,0.12), 0 0 34px rgba(138,100,255,0.55); }
+        }
+        .slot-frame.free-spin-active .reels-container { border-color: rgba(138, 100, 255, 0.55); }
+        
+        .reels-container { 
+            display: flex; gap: 6px; background: #050202; padding: 8px; border-radius: 12px; 
+            border: 2px solid #5c2415; position: relative; overflow: hidden; /* 🌟 សម្រាប់ផ្ទុក SVG Canvas + កាត់ vignette */
+        }
+        .reel { flex: 1; display: flex; flex-direction: column; gap: 6px; position: relative; }
+        /* 🌟 បន្ទាត់ស្តើងៗពណ៌មាសពាក់កណ្តាលថ្លា រវាង reel នីមួយៗ */
+        .reel:not(:last-child)::after {
+            content: ''; position: absolute; top: 4px; bottom: 4px; right: -4px; width: 1px; z-index: 1;
+            background: linear-gradient(180deg, transparent, rgba(212, 175, 55, 0.35) 15%, rgba(212, 175, 55, 0.35) 85%, transparent);
+        }
+        /* 🌟 Vignette fade នៅផ្នែកលើ/ក្រោមរបស់ reels ដើម្បីឱ្យ symbol លេចឡើង/បាត់ទៅដោយស្រួល */
+        .reels-container::before, .reels-container::after {
+            content: ''; position: absolute; left: 0; right: 0; height: 20px; z-index: 6; pointer-events: none;
+        }
+        .reels-container::before { top: 0; background: linear-gradient(180deg, #050202 0%, rgba(5,2,2,0) 100%); }
+        .reels-container::after  { bottom: 0; background: linear-gradient(0deg, #050202 0%, rgba(5,2,2,0) 100%); }
+
+        .symbol-box {
+            width: 100%; height: 75px; border-radius: 8px; display: flex; align-items: center; justify-content: center;
+            transition: 0.3s; position: relative; overflow: hidden;
+            background: linear-gradient(160deg, #18120c 0%, #0c0908 100%);
+            border: 1px solid rgba(212, 175, 55, 0.22);
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.65), inset 0 0 10px rgba(212, 175, 55, 0.06);
+        }
+        .symbol-img { max-width: 85%; max-height: 85%; object-fit: contain; position: relative; z-index: 1; }
+        .reel.spinning .symbol-box { animation: blurVertical 0.1s infinite linear; }
+        /* 🌟 Motion-blur កំឡុងពេល reel កំពុងបង្វិល (ដើម្បីឱ្យមានអារម្មណ៍ movement ជាជាង flicker ធម្មតា) */
+        @keyframes blurVertical {
+            0%   { filter: blur(0px); }
+            45%  { filter: blur(3.5px); }
+            55%  { filter: blur(3.5px); }
+            100% { filter: blur(0px); }
+        }
+        /* 🌟 រាល់ដងដែល symbol ប្តូររូបភាពពេលកំពុងបង្វិល ធ្វើឱ្យវាធ្លាក់ចុះពីលើ ដូចជា reel ពិត */
+        .symbol-img.symbol-cycle { animation: symbolDrop 0.16s ease-in; }
+        @keyframes symbolDrop {
+            0%   { transform: translateY(-55%); opacity: 0.2; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        /* 🌟 ស៊ុមផ្ទាំង reel ចាំងបន្ថែមខណៈកំពុងបង្វិល ដើម្បីទាញការចាប់អារម្មណ៍ */
+        .reels-container.active-spin {
+            animation: spinGlow 0.55s ease-in-out infinite alternate;
+        }
+        @keyframes spinGlow {
+            0%   { box-shadow: inset 0 0 16px rgba(212,175,55,0.05); border-color: #5c2415; }
+            100% { box-shadow: inset 0 0 26px rgba(255,215,0,0.22); border-color: rgba(255,215,0,0.7); }
+        }
+
+        /* 🌟 ស៊ុម glow អចិន្ត្រៃយ៍សម្រាប់ WILD (ខុសពី win-glow ដែលបង្ហាញតែពេលឈ្នះ) ដើម្បីឱ្យសម្គាល់បានលឿន */
+        .symbol-box.is-wild {
+            border-color: rgba(255, 90, 60, 0.55);
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.65), 0 0 10px rgba(255, 90, 60, 0.35), inset 0 0 12px rgba(255, 90, 60, 0.12);
+            animation: wildPulse 2.2s ease-in-out infinite;
+        }
+        @keyframes wildPulse {
+            0%, 100% { box-shadow: inset 0 2px 5px rgba(0,0,0,0.65), 0 0 10px rgba(255,90,60,0.35), inset 0 0 12px rgba(255,90,60,0.12); }
+            50%      { box-shadow: inset 0 2px 5px rgba(0,0,0,0.65), 0 0 18px rgba(255,90,60,0.6),  inset 0 0 16px rgba(255,90,60,0.2); }
+        }
+        /* 🌟 Idle shine sweep — ចាំងម្តងៗឆ្លងកាត់ symbol ដើម្បីឱ្យមើលទៅរស់រវើក (premium feel) */
+        .symbol-box::before {
+            content: ''; position: absolute; top: 0; left: -60%; width: 40%; height: 100%; z-index: 2;
+            background: linear-gradient(115deg, transparent 0%, rgba(255, 255, 255, 0.16) 50%, transparent 100%);
+            transform: skewX(-20deg); pointer-events: none; opacity: 0;
+        }
+        .reel:not(.spinning) .symbol-box::before { animation: idleShine 5.5s ease-in-out infinite; }
+        /* 🌟 offset ពេលនីមួយៗឱ្យមិនចាំងព្រមគ្នាទាំងអស់ */
+        .reel:nth-child(2) .symbol-box::before { animation-delay: 0.4s; }
+        .reel:nth-child(3) .symbol-box::before { animation-delay: 0.8s; }
+        .reel:nth-child(4) .symbol-box::before { animation-delay: 1.2s; }
+        .reel:nth-child(5) .symbol-box::before { animation-delay: 1.6s; }
+        @keyframes idleShine {
+            0%, 92%, 100% { left: -60%; opacity: 0; }
+            94% { opacity: 0.9; }
+            98% { left: 130%; opacity: 0; }
+        }
+
+        /* 🌟 ផ្ទាំងគូរខ្សែ Payline (SVG) */
+        #win-line-canvas {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 10; overflow: visible;
+        }
+        /* 🌟 ស្រទាប់ខាងក្រៅ - ពន្លឺទូលាយ ស្រអាប់ ធ្វើឱ្យខ្សែមើលទៅដូចជា "ខ្សែពន្លឺ" ក្រាស់មិនមែនបន្ទាត់ស្តើងធម្មតា */
+        .win-path-glow {
+            fill: none; stroke: #ff8c00; stroke-width: 9; stroke-linecap: round; stroke-linejoin: round;
+            opacity: 0.45; filter: blur(2.5px);
+        }
+        /* 🌟 ស្រទាប់ខាងក្នុង - ស្នូលភ្លឺចាំង នៅចំកណ្តាលខ្សែក្រាស់ */
+        .win-path {
+            fill: none; stroke: #fff4c2; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round;
+            filter: drop-shadow(0 0 6px #ffd700);
+        }
+        /* 🌟 ចំណុចភ្លឺរត់ចរចរណ៍ឆ្លងកាត់ខ្សែ ក្រោយពេលគូរខ្សែចប់ ដើម្បីទាញការចាប់អារម្មណ៍បន្ថែម */
+        .win-path-spark {
+            fill: #fffbe6; filter: drop-shadow(0 0 5px #ffd700) drop-shadow(0 0 10px #ff8c00);
+        }
+        @keyframes travelSpark { to { offset-distance: 100%; } }
+
+        .win-glow {
+            border-color: #ffd700 !important; background: rgba(255, 215, 0, 0.15) !important;
+            transform: scale(1.1); z-index: 5;
+            animation: pulseGlow 0.7s ease-in-out infinite alternate;
+        }
+        @keyframes pulseGlow {
+            0%   { box-shadow: 0 0 12px #ffd700; }
+            100% { box-shadow: 0 0 32px #ffd700, 0 0 12px #fff8dc; }
+        }
+
+        /* 🌟 Reel ចុះចត ធ្វើឱ្យមានអារម្មណ៍ "ធាក់" បន្តិច */
+        @keyframes reelLand {
+            0%   { transform: scale(1.08); }
+            60%  { transform: scale(0.96); }
+            100% { transform: scale(1); }
+        }
+        .reel-landed { animation: reelLand 0.25s ease-out; }
+
+        /* 🌟 Badge បង្ហាញចំនួនលុយឈ្នះនៅលើខ្សែនីមួយៗ */
+        .win-line-badge {
+            position: absolute; transform: translate(-50%, -50%); z-index: 20;
+            background: linear-gradient(180deg, #ffe066, #f39c12); color: #2a0f08;
+            font-weight: 900; font-size: 13px; padding: 3px 10px; border-radius: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.6), 0 0 12px #ffd700; white-space: nowrap;
+            animation: floatBadge 1.4s ease-out forwards; pointer-events: none;
+        }
+        @keyframes floatBadge {
+            0%   { opacity: 0; transform: translate(-50%, -50%) translateY(0) scale(0.6); }
+            15%  { opacity: 1; transform: translate(-50%, -50%) translateY(-14px) scale(1.05); }
+            75%  { opacity: 1; transform: translate(-50%, -50%) translateY(-18px) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -50%) translateY(-34px) scale(0.9); }
+        }
+
+        /* 🌟 លុយធ្លាក់ពីលើ (coin rain) សម្រាប់ Big Win */
+        .coin-container { position: fixed; inset: 0; pointer-events: none; z-index: 250; overflow: hidden; }
+        .coin {
+            position: absolute; top: -30px; width: 20px; height: 20px; border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #fff6c8, #ffd700 55%, #b8860b 100%);
+            box-shadow: 0 0 6px rgba(255, 215, 0, 0.8); animation: coinFall linear forwards;
+        }
+        @keyframes coinFall {
+            0%   { transform: translateY(-30px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(110vh) rotate(720deg); opacity: 0.9; }
+        }
+
+        /* 🌟 ផ្ទាំង Celebration សម្រាប់ Big Win / Mega Win */
+        .big-win-overlay {
+            position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: rgba(0, 0, 0, 0.55); z-index: 300; opacity: 0; pointer-events: none; transition: opacity 0.25s;
+        }
+        .big-win-overlay.show { opacity: 1; pointer-events: auto; }
+        .big-win-title {
+            font-size: 40px; font-weight: 900; letter-spacing: 2px; text-align: center;
+            background: linear-gradient(180deg, #fff6c8, #ffd700 40%, #f39c12 70%, #b33900);
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+            filter: drop-shadow(0 4px 10px rgba(0,0,0,0.6));
+            animation: popIn 0.5s cubic-bezier(.34,1.56,.64,1);
+        }
+        .big-win-amount {
+            margin-top: 10px; font-size: 30px; font-weight: 800; color: #fff;
+            text-shadow: 0 0 14px #ffd700; animation: popIn 0.5s 0.1s cubic-bezier(.34,1.56,.64,1) both;
+        }
+        @keyframes popIn {
+            0%   { transform: scale(0.3); opacity: 0; }
+            60%  { transform: scale(1.15); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .controls { width: 100%; max-width: 440px; margin-top: 15px; display: flex; flex-direction: column; gap: 12px; }
+        .dashboard-bar { display: flex; justify-content: space-between; gap: 10px; }
+        
+        /* 🌟 កន្លែងចុចរើស Bet ថ្មី */
+        .bet-box { 
+            flex: 1; background: rgba(30, 10, 5, 0.8); border: 1px solid #8b5a2b; border-radius: 12px; 
+            padding: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            cursor: pointer; transition: 0.2s; box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+        .bet-box:active { transform: scale(0.95); background: rgba(50, 20, 10, 0.8); }
+        .win-box { flex: 1; background: rgba(30, 10, 5, 0.8); border: 1px solid #8b5a2b; border-radius: 12px; padding: 10px; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+        
+        .spin-btn { background: linear-gradient(180deg, #ffe066, #f39c12, #b33900); border: none; color: #000; font-size: 22px; font-weight: 900; padding: 14px; border-radius: 30px; cursor: pointer; box-shadow: 0 6px 15px rgba(243, 156, 18, 0.4); text-transform: uppercase; }
+        .spin-btn:disabled { opacity: 0.5; }
+
+        /* 🌟 ជួរ Spin + Auto Spin */
+        .spin-row { display: flex; gap: 10px; align-items: stretch; }
+        .spin-row .spin-btn { flex: 2; }
+        .auto-btn {
+            flex: 1; background: rgba(30, 10, 5, 0.85); border: 1px solid #8b5a2b; color: #ffd700;
+            font-size: 14px; font-weight: 800; border-radius: 30px; cursor: pointer; letter-spacing: 0.3px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.2;
+        }
+        .auto-btn:active { transform: scale(0.96); }
+        .auto-btn.active {
+            background: linear-gradient(180deg, #ff6b6b, #c0392b); color: #fff; border-color: #ff6b6b;
+            animation: autoPulse 1s ease-in-out infinite;
+        }
+        @keyframes autoPulse { 0%,100% { box-shadow: 0 0 0 rgba(255,107,107,0.6); } 50% { box-shadow: 0 0 14px rgba(255,107,107,0.8); } }
+        .auto-btn .auto-sub { font-size: 10px; font-weight: 600; opacity: 0.85; }
+
+        /* 🌟 ផ្ទាំង Bet Modal Popup */
+        .bet-modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 100; opacity: 0; pointer-events: none; transition: 0.3s;
+        }
+        .bet-modal-overlay.show { opacity: 1; pointer-events: auto; }
+        .bet-modal {
+            background: linear-gradient(145deg, rgba(42, 15, 8, 0.65), rgba(26, 8, 4, 0.75));
+            backdrop-filter: blur(18px) saturate(150%); -webkit-backdrop-filter: blur(18px) saturate(150%);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            border-radius: 20px; padding: 20px; width: 90%; max-width: 350px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,255,255,0.1);
+            transform: scale(0.8); transition: 0.3s;
+        }
+        .bet-modal-overlay.show .bet-modal { transform: scale(1); }
+        .bet-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 15px; }
+        .bet-option {
+            background: rgba(0,0,0,0.5); border: 1px solid #5c2415; color: #ffd700;
+            padding: 12px; border-radius: 10px; font-size: 16px; font-weight: bold; text-align: center; cursor: pointer;
+        }
+        .bet-option.active, .bet-option:active { background: #d4af37; color: #000; box-shadow: 0 0 15px rgba(212, 175, 55, 0.5); }
+        .close-modal { margin-top: 15px; width: 100%; padding: 10px; border-radius: 10px; border: none; background: #e74c3c; color: #fff; font-weight: bold; font-size: 16px; cursor: pointer; }
+
+        /* 🌟 Combo Streak badge */
+        .streak-badge {
+            display: none; align-items: center; gap: 5px; width: 100%; max-width: 440px;
+            justify-content: center; margin-bottom: 8px; font-weight: 800; font-size: 13px;
+            color: #ff8c42; letter-spacing: 0.3px; animation: streakPulse 0.5s ease-out;
+        }
+        .streak-badge.show { display: flex; }
+        @keyframes streakPulse { 0% { transform: scale(0.7); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+        /* 🌟 Free Spins banner */
+        .free-spin-banner {
+            display: none; width: 100%; max-width: 440px; margin-bottom: 8px; padding: 8px 14px;
+            border-radius: 12px; background: linear-gradient(90deg, #6a11cb, #2575fc);
+            align-items: center; justify-content: space-between; font-weight: 800; font-size: 13px;
+            color: #fff; box-shadow: 0 0 18px rgba(37, 117, 252, 0.5); animation: freeSpinGlow 1.4s ease-in-out infinite alternate;
+        }
+        .free-spin-banner.show { display: flex; }
+        @keyframes freeSpinGlow { 0% { box-shadow: 0 0 10px rgba(37,117,252,0.4);} 100% { box-shadow: 0 0 22px rgba(37,117,252,0.8);} }
+
+        /* 🌟 Pick-a-box mini game modal */
+        .pickbox-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 18px; }
+        .pick-box {
+            aspect-ratio: 1; border-radius: 14px; cursor: pointer;
+            background: linear-gradient(160deg, #b8860b, #4a2c00); border: 2px solid #ffd700;
+            display: flex; align-items: center; justify-content: center; font-size: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.6); transition: transform 0.15s;
+        }
+        .pick-box:active { transform: scale(0.94); }
+        .pick-box.revealed { background: linear-gradient(160deg, #2ecc71, #0d6b3a); cursor: default; font-size: 15px; font-weight: 900; color: #fff; }
+        .pick-box.locked { opacity: 0.4; cursor: default; }
+
+        /* 🌟 Achievement Badge Toast */
+        .badge-toast-container { position: fixed; top: 16px; left: 50%; transform: translateX(-50%); z-index: 400; display: flex; flex-direction: column; gap: 8px; align-items: center; }
+        .badge-toast {
+            display: flex; align-items: center; gap: 8px; background: linear-gradient(90deg, #1a0804, #3d1409);
+            border: 1px solid #ffd700; border-radius: 30px; padding: 8px 16px; color: #ffd700;
+            font-size: 13px; font-weight: 700; box-shadow: 0 4px 16px rgba(0,0,0,0.6);
+            animation: badgeIn 0.4s ease-out, badgeOut 0.4s ease-in 2.6s forwards;
+        }
+        @keyframes badgeIn { 0% { opacity: 0; transform: translateY(-16px); } 100% { opacity: 1; transform: translateY(0); } }
+        @keyframes badgeOut { 0% { opacity: 1; } 100% { opacity: 0; transform: translateY(-16px); } }
+
+        .auto-stop-row { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; text-align: left; }
+        .auto-stop-row label { font-size: 11px; color: #b89b6a; }
+        .auto-stop-row input {
+            width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid #8b5a2b;
+            background: rgba(0,0,0,0.4); color: #fff; font-size: 14px;
+        }
+
+        /* 🌟 Confetti សម្រាប់ MEGA WIN */
+        .confetti-piece {
+            position: absolute; top: -20px; z-index: 260; pointer-events: none;
+            animation: confettiFall linear forwards;
+        }
+        @keyframes confettiFall {
+            0%   { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(110vh) rotate(600deg); opacity: 0.9; }
+        }
+
+        /* 🌟 Screen shake សម្រាប់ MEGA WIN */
+        @keyframes screenShake {
+            0%, 100% { transform: translate(0, 0); }
+            20% { transform: translate(-6px, 4px); }
+            40% { transform: translate(6px, -4px); }
+            60% { transform: translate(-5px, -3px); }
+            80% { transform: translate(5px, 3px); }
+        }
+        body.screen-shake { animation: screenShake 0.4s ease-in-out; }
+
+        /* 🌟 Near-miss glow — ពេលជិតប៉ះ 5-of-a-kind (4 ដងជាប់ៗគ្នា) */
+        .near-miss-glow {
+            border-color: #ff8c42 !important; z-index: 6;
+            animation: nearMissPulse 0.5s ease-in-out 3;
+        }
+        @keyframes nearMissPulse {
+            0%, 100% { box-shadow: 0 0 8px #ff8c42; }
+            50% { box-shadow: 0 0 26px #ff8c42, 0 0 10px #fff; }
+        }
+
+        /* 🌟 ប៊ូតុង Share Win */
+        .share-win-btn {
+            margin-top: 14px; padding: 8px 20px; border-radius: 20px; border: 1px solid #ffd700;
+            background: rgba(255, 215, 0, 0.12); color: #ffd700; font-weight: 700; font-size: 13px;
+            cursor: pointer; pointer-events: auto; animation: popIn 0.5s 0.2s cubic-bezier(.34,1.56,.64,1) both;
+        }
+        .share-win-btn:active { transform: scale(0.95); }
+
+        /* 🌟 Leaderboard modal */
+        .leaderboard-list { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; max-height: 340px; overflow-y: auto; }
+        .leaderboard-row {
+            display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px;
+            background: rgba(0,0,0,0.35); border: 1px solid #5c2415;
+        }
+        .leaderboard-row.rank-1 { border-color: #ffd700; background: rgba(255, 215, 0, 0.1); }
+        .leaderboard-row.rank-2 { border-color: #c0c0c0; background: rgba(192, 192, 192, 0.08); }
+        .leaderboard-row.rank-3 { border-color: #cd7f32; background: rgba(205, 127, 50, 0.08); }
+        .leaderboard-rank { font-weight: 900; font-size: 15px; color: #ffd700; width: 24px; text-align: center; flex-shrink: 0; }
+        .leaderboard-name { flex: 1; font-weight: 700; font-size: 14px; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .leaderboard-amount { font-weight: 800; font-size: 14px; color: #2ecc71; text-align: right; }
+        .leaderboard-multiplier { font-size: 10px; color: #b89b6a; text-align: right; }
+        .leaderboard-empty { text-align: center; color: #b89b6a; font-size: 13px; padding: 20px 0; }
+
+        /* 🌟 History modal (spin history + session summary) */
+        .history-summary {
+            display: flex; justify-content: space-between; gap: 8px; margin-top: 14px; padding: 10px 4px;
+            border-top: 1px solid rgba(255,215,0,0.15); border-bottom: 1px solid rgba(255,215,0,0.15);
+        }
+        .history-summary-item { flex: 1; text-align: center; }
+        .history-summary-label { font-size: 10px; color: #b89b6a; margin-bottom: 2px; }
+        .history-summary-value { font-size: 14px; font-weight: 800; }
+        .history-summary-value.positive { color: #2ecc71; }
+        .history-summary-value.negative { color: #e74c3c; }
+        .history-list { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; max-height: 300px; overflow-y: auto; }
+        .history-row {
+            display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 10px;
+            background: rgba(0,0,0,0.3); border: 1px solid #5c2415; font-size: 12.5px;
+        }
+        .history-row.win { border-color: rgba(46, 204, 113, 0.4); }
+        .history-time { color: #b89b6a; width: 44px; flex-shrink: 0; }
+        .history-bet { color: #ddd; flex: 1; }
+        .history-net { font-weight: 800; text-align: right; min-width: 62px; }
+        .history-net.positive { color: #2ecc71; }
+        .history-net.zero { color: #999; }
+    </style>
+</head>
+<body>
+
+    <!-- 🌟 កន្លែងបង្ហាញលុយធ្លាក់ (coin rain) -->
+    <div class="coin-container" id="coin-container"></div>
+
+    <!-- 🌟 Achievement Badge Toast -->
+    <div class="badge-toast-container" id="badge-toast-container"></div>
+
+    <!-- 🌟 ផ្ទាំង Celebration Big Win / Mega Win -->
+    <div class="big-win-overlay" id="big-win-overlay">
+        <div class="big-win-title" id="big-win-title"></div>
+        <div class="big-win-amount" id="big-win-amount"></div>
+        <button class="share-win-btn" id="share-win-btn" onclick="shareWin()">📤 ចែករំលែកជ័យជម្នះ</button>
+    </div>
+
+    <a href="index.html" class="home-btn" title="ត្រឡប់ទៅ Lobby">⌂</a>
+
+    <div class="game-logo-container">
+        <div class="icon-btn-group left">
+            <button class="icon-btn" id="leaderboard-btn" onclick="showLeaderboard()" title="Leaderboard">🏆</button>
+            <button class="icon-btn" id="history-btn" onclick="showHistory()" title="ប្រវត្តិ Spin">📜</button>
+        </div>
+        <div class="game-logo"><img src="GoldenDragon.png" alt="Golden Dragon Fortune"></div>
+        <div class="icon-btn-group right">
+            <button class="icon-btn" id="turbo-btn" onclick="toggleTurbo()" title="Turbo Spin">⚡</button>
+            <button class="icon-btn" id="mute-btn" onclick="toggleMute()" title="សំឡេង">🔊</button>
+            <button class="icon-btn" id="info-btn" onclick="showGameInfo()" title="Paytable & Odds">ℹ️</button>
+        </div>
+    </div>
+
+    <div class="session-badge" id="session-badge">Spins today: --</div>
+
+    <div class="user-card">
+        <div class="user-info">
+            <div class="user-avatar" id="u-avatar">P</div>
+            <div class="user-details"><span class="user-name" id="u-name">Player</span></div>
+        </div>
+        <div class="balance-section">
+            <div class="balance-badge" id="balance-display">$10.00</div>
+            <div class="wallet-actions">
+                <button class="wallet-btn deposit" onclick="openWalletModal('deposit')">+ ដាក់ប្រាក់</button>
+                <button class="wallet-btn withdraw" onclick="openWalletModal('withdraw')">− ដកប្រាក់</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🌟 Combo Streak badge -->
+    <div class="streak-badge" id="streak-badge">🔥 <span id="streak-text">Streak x0</span></div>
+
+    <!-- 🌟 Free Spins banner -->
+    <div class="free-spin-banner" id="free-spin-banner">
+        <span>🎁 FREE SPINS <span id="free-spin-multiplier">x2</span></span>
+        <span id="free-spin-remaining">10 នៅសល់</span>
+    </div>
+
+    <div class="slot-frame">
+        <div class="reels-container" id="slot-grid">
+            <!-- 🌟 SVG សម្រាប់គូរខ្សែរត់ពីលើ -->
+            <svg id="win-line-canvas"></svg>
+            
+            <div class="reel" id="reel-0"></div>
+            <div class="reel" id="reel-1"></div>
+            <div class="reel" id="reel-2"></div>
+            <div class="reel" id="reel-3"></div>
+            <div class="reel" id="reel-4"></div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <div class="dashboard-bar">
+            <!-- 🌟 ប្តូរទៅជា Button ចុចបើក Modal -->
+            <div class="bet-box" onclick="openBetModal()">
+                <div style="font-size: 11px; color: #aaa; margin-bottom: 2px;">TOTAL BET <small>(Click)</small></div>
+                <div id="bet-display" style="font-size: 18px; font-weight: bold; color: #ffd700;">$0.10</div>
+            </div>
+            <div class="win-box">
+                <span style="font-size: 11px; color: #aaa;">WIN</span>
+                <span id="win-display" style="font-size: 18px; font-weight: bold; color: #fff;">$0.00</span>
+            </div>
+        </div>
+        <div class="spin-row">
+            <button class="spin-btn" id="spin-btn" onclick="spin()">SPIN</button>
+            <button class="auto-btn" id="auto-btn" onclick="onAutoBtnClick()">
+                <span id="auto-btn-label">AUTO</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 🌟 ផ្ទាំង Auto Spin Modal -->
+    <div class="bet-modal-overlay" id="auto-modal-overlay">
+        <div class="bet-modal">
+            <h3 style="text-align: center; color: #fff;">ជ្រើសរើសចំនួន Auto Spin</h3>
+            <div class="bet-grid">
+                <div class="bet-option" onclick="startAutoSpin(10)">10x</div>
+                <div class="bet-option" onclick="startAutoSpin(20)">20x</div>
+                <div class="bet-option" onclick="startAutoSpin(50)">50x</div>
+                <div class="bet-option" onclick="startAutoSpin(100)">100x</div>
+            </div>
+            <div class="auto-stop-row">
+                <label>ឈប់ ប្រសិនបើឈ្នះលើសពី ($) — ទុកទទេបើមិនចង់កំណត់</label>
+                <input type="number" id="auto-stop-win-input" placeholder="ឧ. 5.00" min="0" step="0.01">
+                <label>ឈប់ ប្រសិនបើសមតុល្យធ្លាក់ក្រោម ($) — ទុកទទេបើមិនចង់កំណត់</label>
+                <input type="number" id="auto-stop-balance-input" placeholder="ឧ. 2.00" min="0" step="0.01">
+            </div>
+            <p style="margin-top:12px; font-size:11px; color:#999; text-align:center;">
+                🌱 Auto Spin នឹងឈប់ដោយស្វ័យប្រវត្តិបើប្រាក់មិនគ្រប់ ឬដល់ការកំណត់ប្រចាំថ្ងៃ ឬដល់លក្ខខណ្ឌខាងលើ។ អ្នកអាចចុច "ឈប់" ពេលណាក៏បាន។
+            </p>
+            <button class="close-modal" onclick="closeAutoModal()">បិទ</button>
+        </div>
+    </div>
+
+    <!-- 🌟 ផ្ទាំង Bet Modal -->
+    <div class="bet-modal-overlay" id="bet-modal-overlay">
+        <div class="bet-modal">
+            <h3 style="text-align: center; color: #fff;">ជ្រើសរើសប្រាក់ភ្នាល់</h3>
+            <div class="bet-grid">
+                <div class="bet-option active" onclick="selectBet(0.10, this)">$0.10</div>
+                <div class="bet-option" onclick="selectBet(0.20, this)">$0.20</div>
+                <div class="bet-option" onclick="selectBet(0.50, this)">$0.50</div>
+                <div class="bet-option" onclick="selectBet(1.00, this)">$1.00</div>
+                <div class="bet-option" onclick="selectBet(2.00, this)">$2.00</div>
+                <div class="bet-option" onclick="selectBet(5.00, this)">$5.00</div>
+            </div>
+            <button class="close-modal" onclick="closeBetModal()">បិទ</button>
+        </div>
+    </div>
+
+    <!-- 🌟 ផ្ទាំង Leaderboard -->
+    <div class="bet-modal-overlay" id="leaderboard-modal-overlay">
+        <div class="bet-modal">
+            <h3 style="text-align: center; color: #fff;">🏆 ជ័យលាភីប្រចាំថ្ងៃ</h3>
+            <div class="leaderboard-list" id="leaderboard-list">
+                <div class="leaderboard-empty">កំពុងផ្ទុក...</div>
+            </div>
+            <button class="close-modal" onclick="closeLeaderboard()">បិទ</button>
+        </div>
+    </div>
+
+    <!-- 🌟 ផ្ទាំង Spin History / Session Summary -->
+    <div class="bet-modal-overlay" id="history-modal-overlay">
+        <div class="bet-modal">
+            <h3 style="text-align: center; color: #fff;">📜 ប្រវត្តិ Spin (សម័យលេងនេះ)</h3>
+            <div class="history-summary" id="history-summary">
+                <div class="history-summary-item">
+                    <div class="history-summary-label">ចាក់សរុប</div>
+                    <div class="history-summary-value" id="history-total-bet">$0.00</div>
+                </div>
+                <div class="history-summary-item">
+                    <div class="history-summary-label">ឈ្នះសរុប</div>
+                    <div class="history-summary-value" id="history-total-win">$0.00</div>
+                </div>
+                <div class="history-summary-item">
+                    <div class="history-summary-label">សុទ្ធ</div>
+                    <div class="history-summary-value" id="history-net">$0.00</div>
+                </div>
+            </div>
+            <div class="history-list" id="history-list">
+                <div class="leaderboard-empty">មិនទាន់មាន spin ណាមួយនៅឡើយទេ</div>
+            </div>
+            <button class="close-modal" onclick="closeHistory()">បិទ</button>
+        </div>
+    </div>
+
+    <!-- 🌟 ផ្ទាំង Pick-a-box Bonus (បង្ហាញពេល Free Spins trigger) -->
+    <div class="bet-modal-overlay" id="pickbox-modal-overlay">
+        <div class="bet-modal">
+            <h3 style="text-align: center; color: #fff;">🎁 ជ្រើសរើសប្រអប់មួយ!</h3>
+            <p style="margin-top:6px; font-size:12px; color:#b89b6a; text-align:center;">
+                អ្នកឈ្នះ Free Spins! ជ្រើសយកប្រអប់ ១ ដើម្បីទទួលរង្វាន់បន្ថែម។
+            </p>
+            <div class="pickbox-grid" id="pickbox-grid"></div>
+            <button class="close-modal" id="pickbox-close-btn" style="display:none;" onclick="closePickBoxModal()">បន្ត</button>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://127.0.0.1:8000/api';
+        let userBalance = 10.00;
+        let currentBet = 0.10;
+        let isSpinning = false;
+
+        // 🌟 Auto Spin state
+        let autoSpinActive = false;
+        let autoSpinRemaining = 0;
+        const AUTO_SPIN_DELAY_MS = 650; // 🌟 ការសម្រាកខ្លីរវាងវគ្គនីមួយៗ ដូចម៉ាស៊ីនពិត
+        let lastSpinWin = 0; // 🌟 ចំនួនឈ្នះនៃ spin ចុងក្រោយ — ប្រើសម្រាប់ auto-stop-on-win
+
+        // 🌟 Sound mute — រក្សាទុកតាម localStorage ដូច្នេះចាំចំណង់ចំណូលចិត្តរបស់អ្នកលេងរាល់ពេលចូលមកវិញ
+        let soundMuted = localStorage.getItem('gdf_sound_muted') === '1';
+        // 🌟 Turbo mode — បង្រួញរយៈពេល animation ដើម្បីលេងលឿនជាង (ក៏រក្សាទុកតាម localStorage ដែរ)
+        let turboMode = localStorage.getItem('gdf_turbo_mode') === '1';
+        // 🌟 ប្រវត្តិ spin ក្នុងសម័យលេងបច្ចុប្បន្ន (មិនចាំបាច់ persist ទៅ server ទេ - គ្រាន់តែសម្រាប់មើលក្នុងសម័យនេះ)
+        let spinHistory = [];
+        const SPIN_HISTORY_MAX = 30;
+
+        // 🌟 ព្យាយាមទាញយក user ពិតពី Telegram Web App, បើគ្មាន (បើកតាម browser ធម្មតា)
+        // ប្រើ id សម្រាប់សាកល្បង។ user_id ត្រូវផ្គូផ្គងជាមួយ backend ដើម្បីតាមដាន balance
+        const tg = window.Telegram ? window.Telegram.WebApp : null;
+        const tgUser = tg && tg.initDataUnsafe && tg.initDataUnsafe.user;
+        // 🌟 tg.initData ជា raw string ដែលមាន hash ចុះហត្ថលេខាដោយ Telegram — Backend ត្រូវការវា
+        // ដើម្បីផ្ទៀងផ្ទាត់ថា user_id ជាមែនរបស់ Telegram session នេះ មិនមែនត្រូវបានក្លែងបន្លំទេ។
+        let userData = tgUser
+            ? { id: tgUser.id, first_name: tgUser.first_name || "Player", initData: tg.initData || "" }
+            : { id: 888888, first_name: "Player", initData: "" };
+
+        if (tg) { tg.ready(); tg.expand(); }
+
+        document.getElementById('u-name').innerText = userData.first_name;
+        document.getElementById('u-avatar').innerText = userData.first_name.charAt(0).toUpperCase();
+
+        // 🌟 ទាញយក balance ពិតពី server ពេលបើកទំព័រ ជំនួសការសន្មត $10.00 រហូត
+        async function syncBalance() {
+            try {
+                const res = await fetch(`${API_URL}/balance/${userData.id}`);
+                if (!res.ok) return;
+                const data = await res.json();
+                userBalance = data.balance;
+                document.getElementById('balance-display').innerText = `$${userBalance.toFixed(2)}`;
+            } catch (err) {
+                console.error('Balance sync failed:', err);
+            }
+
+            try {
+                const statsRes = await fetch(`${API_URL}/spin-stats/${userData.id}`);
+                if (!statsRes.ok) return;
+                const stats = await statsRes.json();
+                updateSessionBadge(stats);
+                updateStreakBadge(stats);
+                updateFreeSpinBanner(stats);
+            } catch (err) {
+                console.error('Spin-stats sync failed:', err);
+            }
+        }
+
+        // 🌟 រង្វាន់ចូលលេងលើកដំបូងប្រចាំថ្ងៃ — ហៅម្តងតែពេលបើកទំព័រ
+        async function claimDailyBonus() {
+            try {
+                const res = await fetch(`${API_URL}/daily-bonus/${userData.id}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ init_data: userData.initData })
+                });
+                if (!res.ok) return;
+                const data = await res.json();
+                if (data.status === 'claimed') {
+                    const prevBalance = userBalance;
+                    userBalance = data.balance;
+                    animateValue(document.getElementById('balance-display'), prevBalance, userBalance, 600);
+                    if (window.Swal) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'រង្វាន់ចូលលេងប្រចាំថ្ងៃ! 🎁',
+                            text: `អ្នកទទួលបាន $${data.amount.toFixed(2)} ឥតគិតថ្លៃ!`,
+                            confirmButtonColor: '#f39c12',
+                        });
+                    }
+                }
+            } catch (err) {
+                console.error('Daily bonus claim failed:', err);
+            }
+        }
+
+       const symbolImages = {
+            'WILD': 'WILD.png',
+            'BONUS': 'BONUS.png',
+            'INGOT': 'INGOT.png',
+            'ENVELOPE': 'ENVELOPE.png',
+            'PIXIU': 'PIXIU.png',
+            'LION': 'LION.png',
+            'FISH': 'FISH.png',
+            'A': 'A.png',
+            'K': 'k.png',
+            'Q': 'Q.png',
+            'J_10': 'J_10.png'
+        };
+        const allSymbols = Object.keys(symbolImages);
+
+        function initGrid() {
+            for (let i = 0; i < 5; i++) {
+                const reel = document.getElementById(`reel-${i}`);
+                reel.innerHTML = '';
+                for (let j = 0; j < 3; j++) {
+                    const box = document.createElement('div');
+                    box.className = 'symbol-box';
+                    box.id = `box-${i}-${j}`; // 🌟 ដាក់ ID ដើម្បីងាយស្រួលចាប់ទីតាំងគូរខ្សែ
+                    box.innerHTML = `<img class="symbol-img" src="${symbolImages['A']}">`;
+                    reel.appendChild(box);
+                }
+            }
+        }
+        initGrid();
+        syncBalance();
+        claimDailyBonus();
+
+        // ==================== 🌟 Sound Design (Web Audio API, គ្មានឯកសារ audio ខាងក្រៅ) ====================
+        let audioCtx = null;
+        function getAudioCtx() {
+            // Browser តម្រូវឱ្យបង្កើត AudioContext បន្ទាប់ពី user interaction
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            return audioCtx;
+        }
+
+        function playTone(freq, startTime, duration, type = 'sine', peakGain = 0.15) {
+            if (soundMuted) return; // 🌟 ធ្វើឱ្យស្ងាត់ទាំងស្រុង — មិនបង្កើត AudioContext ដោយឥតប្រយោជន៍ទេ
+            const ctx = getAudioCtx();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, startTime);
+            gain.gain.setValueAtTime(0, startTime);
+            gain.gain.linearRampToValueAtTime(peakGain, startTime + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+            osc.connect(gain).connect(ctx.destination);
+            osc.start(startTime);
+            osc.stop(startTime + duration + 0.05);
+        }
+
+        function playSpinSound() {
+            const ctx = getAudioCtx();
+            const now = ctx.currentTime;
+            playTone(220, now, 0.15, 'triangle', 0.08);
+        }
+
+        function playReelStopSound() {
+            const ctx = getAudioCtx();
+            const now = ctx.currentTime;
+            playTone(340, now, 0.08, 'square', 0.06);
+        }
+
+        function playWinSound(tier = 'small') {
+            const ctx = getAudioCtx();
+            const now = ctx.currentTime;
+            // ស្រៈពណ៌តូច arpeggio ឡើងលើ ដូចសំឡេងហ្គេម slot ពិត
+            const notes = tier === 'mega'
+                ? [523, 659, 784, 1047, 1319, 1568]
+                : tier === 'big'
+                    ? [523, 659, 784, 1047]
+                    : [523, 659, 784];
+            notes.forEach((freq, i) => playTone(freq, now + i * 0.09, 0.25, 'sine', 0.13));
+        }
+
+        function playErrorSound() {
+            const ctx = getAudioCtx();
+            const now = ctx.currentTime;
+            playTone(220, now, 0.2, 'sawtooth', 0.08);
+            playTone(160, now + 0.12, 0.25, 'sawtooth', 0.08);
+        }
+
+        // ==================== 🌟 Paytable / Odds / RTP Transparency ====================
+        async function showGameInfo() {
+            try {
+                const res = await fetch(`${API_URL}/game-info`);
+                const info = await res.json();
+
+                const rows = Object.entries(info.paytable).map(([symbol, payouts]) => `
+                    <tr>
+                        <td style="padding:6px; text-align:left;">${symbol}</td>
+                        <td style="padding:6px;">${(payouts['3'] ?? payouts[3] ?? '-')}x</td>
+                        <td style="padding:6px;">${(payouts['4'] ?? payouts[4] ?? '-')}x</td>
+                        <td style="padding:6px;">${(payouts['5'] ?? payouts[5] ?? '-')}x</td>
+                    </tr>
+                `).join('');
+
+                const rtpText = info.estimated_rtp_percent != null
+                    ? `${info.estimated_rtp_percent}%`
+                    : 'កំពុងគណនា...';
+
+                const html = `
+                    <div style="text-align:left; font-size:13px; color:#eee;">
+                        <p style="margin-bottom:10px;">
+                            <b>RTP ប៉ាន់ស្មាន:</b> <span style="color:#2ecc71; font-weight:bold;">${rtpText}</span>
+                            <small style="color:#aaa;">(គណនាពីការសាកល្បង Monte Carlo ជាច្រើនម៉ឺនដង — ជាតួលេខប៉ាន់ស្មាន មិនមែនធានាលទ្ធផលរាល់ spin ទេ)</small>
+                        </p>
+                        <p style="margin-bottom:6px;"><b>Paylines:</b> ${info.num_paylines} ខ្សែ | <b>Bet:</b> $${info.min_bet} - $${info.max_bet}</p>
+                        <table style="width:100%; border-collapse:collapse; margin-top:8px;">
+                            <thead>
+                                <tr style="color:#ffd700; border-bottom:1px solid rgba(255,215,0,0.3);">
+                                    <th style="padding:6px; text-align:left;">និមិត្តសញ្ញា</th>
+                                    <th style="padding:6px;">3x</th>
+                                    <th style="padding:6px;">4x</th>
+                                    <th style="padding:6px;">5x</th>
+                                </tr>
+                            </thead>
+                            <tbody>${rows}</tbody>
+                        </table>
+                        <p style="margin-top:10px; font-size:11px; color:#999;">
+                            🌱 សូមលេងដោយសប្បាយ និងចេះកំណត់ថវិកា។ នេះជាហ្គេមសាកល្បង (demo)។
+                        </p>
+                    </div>
+                `;
+
+                Swal.fire({
+                    title: 'Paytable & Odds',
+                    html,
+                    width: 420,
+                    background: '#1a0804',
+                    color: '#fff',
+                    confirmButtonColor: '#f39c12',
+                    confirmButtonText: 'យល់ហើយ',
+                });
+            } catch (err) {
+                console.error(err);
+                showError('មិនអាចទាញយកព័ត៌មានហ្គេមបានទេ');
+            }
+        }
+
+        // ==================== 🌟 Spin Count UI ====================
+        function updateSessionBadge(data) {
+            const badge = document.getElementById('session-badge');
+            if (data.spins_today == null) return;
+            badge.innerText = `Spins today: ${data.spins_today}`;
+        }
+
+        // 🌟 Combo Streak badge — បង្ហាញនៅពេលឈ្នះជាប់ៗគ្នាចាប់ពី 2 ដងឡើងទៅ
+        function updateStreakBadge(data) {
+            const badge = document.getElementById('streak-badge');
+            const text = document.getElementById('streak-text');
+            if (data.streak >= 2) {
+                text.innerText = `Streak x${data.streak}`;
+                badge.classList.add('show');
+            } else {
+                badge.classList.remove('show');
+            }
+        }
+
+        // 🌟 Free Spins banner — បង្ហាញ multiplier ladder បច្ចុប្បន្ន + ចំនួន spin នៅសល់
+        function updateFreeSpinBanner(data) {
+            const banner = document.getElementById('free-spin-banner');
+            const isActive = data.free_spins_remaining > 0;
+            document.querySelector('.slot-frame').classList.toggle('free-spin-active', isActive); // 🌟 ប្តូររូបរាងស៊ុមខណៈ Free Spins សកម្ម
+            if (isActive) {
+                document.getElementById('free-spin-multiplier').innerText = `x${data.free_spin_multiplier}`;
+                document.getElementById('free-spin-remaining').innerText = `${data.free_spins_remaining} នៅសល់`;
+                banner.classList.add('show');
+            } else {
+                banner.classList.remove('show');
+            }
+        }
+
+        // ==================== 🌟 Sound Mute Toggle ====================
+        function updateMuteBtnUI() {
+            const btn = document.getElementById('mute-btn');
+            btn.innerText = soundMuted ? '🔇' : '🔊';
+            btn.classList.toggle('active', soundMuted);
+        }
+        function toggleMute() {
+            soundMuted = !soundMuted;
+            localStorage.setItem('gdf_sound_muted', soundMuted ? '1' : '0');
+            updateMuteBtnUI();
+        }
+        updateMuteBtnUI();
+
+        // ==================== 🌟 Turbo / Quick Spin Toggle ====================
+        function updateTurboBtnUI() {
+            document.getElementById('turbo-btn').classList.toggle('active', turboMode);
+        }
+        function toggleTurbo() {
+            turboMode = !turboMode;
+            localStorage.setItem('gdf_turbo_mode', turboMode ? '1' : '0');
+            updateTurboBtnUI();
+        }
+        updateTurboBtnUI();
+        // 🌟 រយៈពេល stagger រវាង reel ចុះចត (ធម្មតា 150ms/reel, Turbo 50ms/reel)
+        function getReelStaggerMs() { return turboMode ? 50 : 150; }
+        // 🌟 ល្បឿន cycle រូបភាពខណៈកំពុងបង្វិល (ធម្មតា 55ms, Turbo 28ms)
+        function getSpinCycleMs() { return turboMode ? 28 : 55; }
+        // 🌟 រយៈពេលសម្រាករវាង Auto Spin នីមួយៗ (ធម្មតា AUTO_SPIN_DELAY_MS, Turbo ខ្លីជាង)
+        function getAutoSpinDelayMs() { return turboMode ? 200 : AUTO_SPIN_DELAY_MS; }
+
+        // ==================== 🌟 Spin History / Session Summary ====================
+        function recordSpinHistory(bet, win) {
+            spinHistory.unshift({ bet, win, net: round2(win - bet), time: new Date() });
+            if (spinHistory.length > SPIN_HISTORY_MAX) spinHistory.pop();
+        }
+        function round2(n) { return Math.round(n * 100) / 100; }
+
+        function showHistory() {
+            const totalBet = spinHistory.reduce((sum, h) => sum + h.bet, 0);
+            const totalWin = spinHistory.reduce((sum, h) => sum + h.win, 0);
+            const net = round2(totalWin - totalBet);
+
+            document.getElementById('history-total-bet').innerText = `$${totalBet.toFixed(2)}`;
+            document.getElementById('history-total-win').innerText = `$${totalWin.toFixed(2)}`;
+            const netEl = document.getElementById('history-net');
+            netEl.innerText = `${net >= 0 ? '+' : ''}$${net.toFixed(2)}`;
+            netEl.className = 'history-summary-value ' + (net > 0 ? 'positive' : (net < 0 ? 'negative' : ''));
+
+            const listEl = document.getElementById('history-list');
+            if (spinHistory.length === 0) {
+                listEl.innerHTML = '<div class="leaderboard-empty">មិនទាន់មាន spin ណាមួយនៅឡើយទេ</div>';
+            } else {
+                listEl.innerHTML = spinHistory.map(h => {
+                    const timeStr = h.time.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+                    const netClass = h.net > 0 ? 'positive' : (h.net === 0 ? 'zero' : '');
+                    const netStr = `${h.net >= 0 ? '+' : ''}$${h.net.toFixed(2)}`;
+                    return `
+                        <div class="history-row ${h.win > 0 ? 'win' : ''}">
+                            <span class="history-time">${timeStr}</span>
+                            <span class="history-bet">ចាក់ $${h.bet.toFixed(2)}</span>
+                            <span class="history-net ${netClass}">${netStr}</span>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            document.getElementById('history-modal-overlay').classList.add('show');
+        }
+        function closeHistory() { document.getElementById('history-modal-overlay').classList.remove('show'); }
+
+        // 🌟 Achievement Badge toast — បង្ហាញ badge ថ្មីៗម្តងមួយៗ
+        function showBadgeToast(newBadges) {
+            if (!newBadges || newBadges.length === 0) return;
+            const container = document.getElementById('badge-toast-container');
+            newBadges.forEach((b, i) => {
+                setTimeout(() => {
+                    const toast = document.createElement('div');
+                    toast.className = 'badge-toast';
+                    toast.innerText = `🏅 ${b.label}`;
+                    container.appendChild(toast);
+                    setTimeout(() => toast.remove(), 3400);
+                }, i * 500);
+            });
+        }
+
+        // 🌟 Near-miss glow — ពេលមានខ្សែឈ្នះជាប់គ្នា 4 ដង (ជិតដល់ 5-of-a-kind)
+        function checkNearMiss(winningLines) {
+            if (!winningLines) return;
+            winningLines.forEach(line => {
+                if (line.positions && line.positions.length === 4) {
+                    const lastPos = line.positions[line.positions.length - 1];
+                    const box = document.getElementById(`box-${lastPos[0]}-${lastPos[1]}`);
+                    if (box) box.classList.add('near-miss-glow');
+                }
+            });
+        }
+
+        function showBreakReminder(sessionSpins) {
+            Swal.fire({
+                icon: 'info',
+                title: 'សម្រាកបន្តិចទេ? 🌿',
+                text: `អ្នកបានលេងជាប់ៗគ្នារួចហើយ ${sessionSpins} spin ក្នុងវគ្គនេះ។ សូមកុំភ្លេចសម្រាកភ្នែក ហើយកំណត់ថវិកាដែលអ្នកអាចចំណាយបាន។`,
+                confirmButtonText: 'បន្តលេង',
+                confirmButtonColor: '#f39c12',
+                background: '#1a0804',
+                color: '#fff',
+            });
+        }
+
+        function showDailyLimitReached() {
+            Swal.fire({
+                icon: 'info',
+                title: 'គ្រប់ដែនកំណត់ថ្ងៃនេះហើយ 🌙',
+                text: 'អ្នកបានលេងគ្រប់ចំនួន spin សម្រាប់ថ្ងៃនេះហើយ។ សូមត្រឡប់មកលេងវិញនៅថ្ងៃស្អែក — សូមថែរក្សាសុខភាព!',
+                confirmButtonText: 'យល់ហើយ',
+                confirmButtonColor: '#f39c12',
+                background: '#1a0804',
+                color: '#fff',
+            });
+        }
+
+        // 🌟 មុខងារ Bet Modal
+        function openBetModal() { if (!isSpinning && !autoSpinActive) document.getElementById('bet-modal-overlay').classList.add('show'); }
+        function closeBetModal() { document.getElementById('bet-modal-overlay').classList.remove('show'); }
+        function selectBet(amount, element) {
+            currentBet = amount;
+            document.getElementById('bet-display').innerText = `$${currentBet.toFixed(2)}`;
+            document.querySelectorAll('.bet-option').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+            closeBetModal();
+        }
+
+        // 🌟 Leaderboard — ជ័យលាភីធំបំផុតប្រចាំថ្ងៃ
+        async function showLeaderboard() {
+            document.getElementById('leaderboard-modal-overlay').classList.add('show');
+            const listEl = document.getElementById('leaderboard-list');
+            listEl.innerHTML = '<div class="leaderboard-empty">កំពុងផ្ទុក...</div>';
+            try {
+                const res = await fetch(`${API_URL}/leaderboard`);
+                if (!res.ok) throw new Error('fetch failed');
+                const data = await res.json();
+                renderLeaderboard(data.leaderboard || []);
+            } catch (err) {
+                console.error('Leaderboard fetch failed:', err);
+                listEl.innerHTML = '<div class="leaderboard-empty">មិនអាចទាញយកបញ្ជីជ័យលាភីបានទេ</div>';
+            }
+        }
+        function closeLeaderboard() { document.getElementById('leaderboard-modal-overlay').classList.remove('show'); }
+
+        // 🌟 Pick-a-box mini game — បើកនៅពេល bonus_triggered ត្រូវបានទទួលពី /api/spin
+        let pickBoxPending = false;
+
+        function openPickBoxModal(pickBoxData) {
+            pickBoxPending = true;
+            document.getElementById('spin-btn').disabled = true;
+            document.getElementById('auto-btn').disabled = true;
+
+            const grid = document.getElementById('pickbox-grid');
+            grid.innerHTML = '';
+            document.getElementById('pickbox-close-btn').style.display = 'none';
+
+            const count = pickBoxData.count || 4;
+            for (let i = 0; i < count; i++) {
+                const box = document.createElement('div');
+                box.className = 'pick-box';
+                box.id = `pickbox-${i}`;
+                box.innerText = '🎁';
+                box.onclick = () => pickBox(i);
+                grid.appendChild(box);
+            }
+
+            document.getElementById('pickbox-modal-overlay').classList.add('show');
+        }
+
+        async function pickBox(index) {
+            // 🌟 ការពារចុចច្រើនដង / ចុចប្រអប់ដែលបានបើករួច
+            if (!pickBoxPending) return;
+            document.querySelectorAll('.pick-box').forEach(b => b.onclick = null);
+
+            try {
+                const res = await fetch(`${API_URL}/pick-box`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: userData.id, box_index: index, init_data: userData.initData })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.detail || "មានបញ្ហាកើតឡើង");
+
+                const chosenBox = document.getElementById(`pickbox-${index}`);
+                chosenBox.classList.add('revealed');
+                chosenBox.innerText = `+$${data.win_amount.toFixed(2)}`;
+                playWinSound('small');
+
+                const prevBalance = userBalance;
+                userBalance = data.balance;
+                animateValue(document.getElementById('balance-display'), prevBalance, userBalance, 500);
+
+                if (data.finished) {
+                    // 🌟 បង្ហាញតម្លៃប្រអប់ទាំងអស់ដែលនៅសល់ (locked) ដើម្បីឱ្យអ្នកលេងឃើញអ្វីខកខាន
+                    document.querySelectorAll('.pick-box').forEach((box, i) => {
+                        if (i !== index) {
+                            box.classList.add('locked');
+                            if (data.all_values) box.innerText = `$${data.all_values[i].toFixed(2)}x`;
+                        }
+                    });
+                    document.getElementById('pickbox-close-btn').style.display = 'block';
+                    pickBoxPending = false;
+                } else {
+                    // 🌟 មានប្រអប់បន្ថែមទៀតដែលអាចជ្រើសបាន — ចាប់ event ឡើងវិញ
+                    document.querySelectorAll('.pick-box:not(.revealed)').forEach((b, i) => {
+                        const boxIndex = Number(b.id.split('-')[1]);
+                        b.onclick = () => pickBox(boxIndex);
+                    });
+                }
+            } catch (err) {
+                console.error(err);
+                showError(err.message || "មិនអាចជ្រើសរើសប្រអប់បានទេ");
+                document.querySelectorAll('.pick-box:not(.revealed)').forEach((b, i) => {
+                    const boxIndex = Number(b.id.split('-')[1]);
+                    b.onclick = () => pickBox(boxIndex);
+                });
+            }
+        }
+
+        function closePickBoxModal() {
+            document.getElementById('pickbox-modal-overlay').classList.remove('show');
+            pickBoxPending = false;
+            document.getElementById('spin-btn').disabled = autoSpinActive;
+            document.getElementById('auto-btn').disabled = false;
+        }
+
+        function renderLeaderboard(entries) {
+            const listEl = document.getElementById('leaderboard-list');
+            if (!entries.length) {
+                listEl.innerHTML = '<div class="leaderboard-empty">មិនទាន់មានអ្នកឈ្នះថ្ងៃនេះទេ — ចាប់ផ្តើម spin មុនគេ! 🎰</div>';
+                return;
+            }
+            const medals = ['🥇', '🥈', '🥉'];
+            listEl.innerHTML = entries.map((e, i) => {
+                const rankClass = i < 3 ? `rank-${i + 1}` : '';
+                const rankLabel = medals[i] || `#${i + 1}`;
+                const isMe = userData && e.user_id === userData.id;
+                return `
+                    <div class="leaderboard-row ${rankClass}">
+                        <div class="leaderboard-rank">${rankLabel}</div>
+                        <div class="leaderboard-name">${escapeHtml(e.name)}${isMe ? ' (អ្នក)' : ''}</div>
+                        <div>
+                            <div class="leaderboard-amount">$${e.best_win.toFixed(2)}</div>
+                            <div class="leaderboard-multiplier">x${e.multiplier}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.innerText = str;
+            return div.innerHTML;
+        }
+
+        // 🌟 មុខងារគូរខ្សែ Paylines
+        // 🌟 កសាង path string ជាខ្សែកោង រលោង (smooth curve) ឆ្លងកាត់ចំណុចទាំងអស់
+        // ជំនួសបន្ទាត់ត្រង់ mắt cứng ដែលបត់ក្រាស់ៗ - ធ្វើឱ្យខ្សែមើលទៅដូចជា "ខ្សែ" ជាក់ស្តែងជាង
+        function buildSmoothPathD(points) {
+            if (points.length < 2) return '';
+            let d = `M ${points[0].x} ${points[0].y} `;
+            for (let i = 1; i < points.length; i++) {
+                const prev = points[i - 1];
+                const curr = points[i];
+                const midX = (prev.x + curr.x) / 2;
+                // 🌟 Control point ទាំង ២ ស្ថិតនៅកម្រិត Y របស់ចំណុចនីមួយៗ - បង្កើត "S curve" ធម្មជាតិ
+                d += `C ${midX} ${prev.y}, ${midX} ${curr.y}, ${curr.x} ${curr.y} `;
+            }
+            return d;
+        }
+
+        function drawWinningLines(lines) {
+            const svg = document.getElementById('win-line-canvas');
+            svg.innerHTML = ''; // លុបខ្សែចាស់ចោល
+            document.querySelectorAll('.win-line-badge').forEach(b => b.remove());
+            const svgNS = 'http://www.w3.org/2000/svg';
+            const gridWidth = document.getElementById('slot-grid').clientWidth;
+
+            lines.forEach((win, index) => {
+                setTimeout(() => {
+                    const points = [];
+
+                    win.positions.forEach((pos, i) => {
+                        const col = pos[0]; const row = pos[1];
+                        const box = document.getElementById(`box-${col}-${row}`);
+                        box.classList.add('win-glow'); // បើកពន្លឺប្រអប់
+
+                        // គណនាចំណុចកណ្តាលនៃប្រអប់នីមួយៗ
+                        const x = box.offsetLeft + (box.offsetWidth / 2);
+                        const y = box.offsetTop + (box.offsetHeight / 2);
+                        points.push({ x, y });
+
+                        // 🌟 បង្ហាញ badge ចំនួនលុយឈ្នះនៅលើសញ្ញាដំបូងនៃខ្សែ
+                        if (i === 0) {
+                            const badge = document.createElement('div');
+                            badge.className = 'win-line-badge';
+                            badge.style.left = `${x}px`;
+                            badge.style.top = `${y - 24}px`;
+                            badge.innerText = `+$${win.amount.toFixed(2)}`;
+                            document.getElementById('slot-grid').appendChild(badge);
+                            badge.addEventListener('animationend', () => badge.remove());
+                        }
+                    });
+
+                    // 🌟 លាតខ្សែបន្ថែមឱ្យលើសពីគែមឆ្វេង/ស្តាំ ដូចខ្សែឈ្នះម៉ាស៊ីនកាស៊ីណូពិត
+                    // (មិនមែនឈប់ត្រង់ចំណុចកណ្តាលរបស់ symbol ដំបូង/ចុងក្រោយទេ)
+                    const extendedPoints = [
+                        { x: -8, y: points[0].y },
+                        ...points,
+                        { x: gridWidth + 8, y: points[points.length - 1].y },
+                    ];
+                    const pathD = buildSmoothPathD(extendedPoints);
+
+                    // 🌟 គូរជា ២ ស្រទាប់ (ពន្លឺទូលាយ + ស្នូលភ្លឺ) ដើម្បីឱ្យបានអារម្មណ៍ "ខ្សែពន្លឺ" ក្រាស់ៗ
+                    const glowPath = document.createElementNS(svgNS, 'path');
+                    glowPath.setAttribute('d', pathD);
+                    glowPath.setAttribute('class', 'win-path-glow');
+                    svg.appendChild(glowPath);
+
+                    const path = document.createElementNS(svgNS, 'path');
+                    path.setAttribute('d', pathD);
+                    path.setAttribute('class', 'win-path');
+                    svg.appendChild(path);
+
+                    // 🌟 ចំណុចរត់ភ្លឺនៅចុងខ្សែ ចលនាតាមប្រវែងខ្សែពិតប្រាកដ
+                    const spark = document.createElementNS(svgNS, 'circle');
+                    spark.setAttribute('r', '4.5');
+                    spark.setAttribute('class', 'win-path-spark');
+                    spark.style.offsetPath = `path('${pathD}')`;
+                    svg.appendChild(spark);
+
+                    // 🌟 វាស់ប្រវែងខ្សែជាក់ស្តែង (មិនទាយ) ដើម្បីឱ្យ animation "គូរខ្សែ" ត្រឹមត្រូវ
+                    // មិនលឿន/យឺតហួសពីប្រវែងជាក់ស្តែងទេ
+                    const totalLen = path.getTotalLength();
+                    [glowPath, path].forEach(p => {
+                        p.style.strokeDasharray = `${totalLen}`;
+                        p.style.strokeDashoffset = `${totalLen}`;
+                    });
+                    // 🌟 Force reflow មុននឹងផ្លាស់ប្តូរ ដើម្បីឱ្យ transition ដំណើរការ
+                    void path.getBoundingClientRect();
+                    [glowPath, path].forEach(p => {
+                        p.style.transition = 'stroke-dashoffset 0.55s ease-out';
+                        p.style.strokeDashoffset = '0';
+                    });
+                    spark.style.animation = 'travelSpark 0.55s ease-out 0.05s forwards';
+
+                }, index * 400); // បើឈ្នះច្រើនខ្សែ វាគូរមួយៗម្តងមួយខ្សែ
+            });
+        }
+
+        // ==================== 🌟 Demo Wallet (ដាក់ប្រាក់ / ដកប្រាក់) ====================
+        // ចំណាំ: នេះជា virtual currency សម្រាប់ demo ប៉ុណ្ណោះ មិនមែនប្រព័ន្ធទូទាត់ប្រាក់ពិតទេ
+        async function openWalletModal(type) {
+            const isDeposit = type === 'deposit';
+            const { value: amount } = await Swal.fire({
+                title: isDeposit ? 'ដាក់ប្រាក់ (Demo)' : 'ដកប្រាក់ (Demo)',
+                input: 'number',
+                inputLabel: 'ចំនួនទឹកប្រាក់ ($)',
+                inputAttributes: { min: 1, step: '0.01' },
+                inputValue: 10,
+                showCancelButton: true,
+                confirmButtonText: isDeposit ? 'ដាក់ប្រាក់' : 'ដកប្រាក់',
+                cancelButtonText: 'បោះបង់',
+                confirmButtonColor: isDeposit ? '#2ecc71' : '#e74c3c',
+                background: '#1a0804',
+                color: '#fff',
+                inputValidator: (value) => {
+                    if (!value || Number(value) <= 0) return 'សូមបញ្ចូលចំនួនលុយត្រឹមត្រូវ';
+                }
+            });
+
+            if (!amount) return; // ចុច cancel ឬមិនបញ្ចូលអ្វី
+
+            try {
+                const res = await fetch(`${API_URL}/${type}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: userData.id, amount: Number(amount), init_data: userData.initData })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.detail || 'មិនអាចធ្វើប្រតិបត្តិការនេះបានទេ');
+
+                const prevBalance = userBalance;
+                userBalance = data.balance;
+                animateValue(document.getElementById('balance-display'), prevBalance, userBalance, 500);
+
+                Swal.fire({
+                    icon: 'success',
+                    title: isDeposit ? 'ដាក់ប្រាក់ជោគជ័យ!' : 'ដកប្រាក់ជោគជ័យ!',
+                    text: `សមតុល្យថ្មី: $${userBalance.toFixed(2)}`,
+                    confirmButtonColor: '#f39c12',
+                    background: '#1a0804',
+                    color: '#fff',
+                    timer: 1800,
+                    showConfirmButton: false,
+                });
+            } catch (err) {
+                console.error(err);
+                showError(err.message || 'មិនអាចភ្ជាប់ទៅ server បានទេ');
+            }
+        }
+
+        function stopReelsSpinning() {
+            document.querySelectorAll('.reel').forEach(r => r.classList.remove('spinning'));
+            document.getElementById('slot-grid').classList.remove('active-spin');
+        }
+
+        // 🌟 អេនីម៉ាស្យុងលេខរាប់ឡើង (count-up) សម្រាប់ balance/win ឱ្យមើលទៅរស់រវើក
+        function animateValue(el, start, end, duration = 800, prefix = '$') {
+            const startTime = performance.now();
+            function tick(now) {
+                const progress = Math.min((now - startTime) / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+                const value = start + (end - start) * eased;
+                el.innerText = `${prefix}${value.toFixed(2)}`;
+                if (progress < 1) requestAnimationFrame(tick);
+            }
+            requestAnimationFrame(tick);
+        }
+
+        // 🌟 បង្កើតលុយក្រាស់ធ្លាក់ពីលើអេក្រង់ (coin rain)
+        function spawnCoins(count = 24) {
+            const container = document.getElementById('coin-container');
+            for (let i = 0; i < count; i++) {
+                const coin = document.createElement('div');
+                coin.className = 'coin';
+                coin.style.left = `${Math.random() * 100}%`;
+                coin.style.animationDuration = `${1.6 + Math.random() * 1.2}s`;
+                coin.style.animationDelay = `${Math.random() * 0.6}s`;
+                coin.style.width = coin.style.height = `${14 + Math.random() * 12}px`;
+                container.appendChild(coin);
+                coin.addEventListener('animationend', () => coin.remove());
+            }
+        }
+
+        // 🌟 បង្ហាញផ្ទាំង Celebration + coin rain នៅពេលឈ្នះធំ (ធៀបនឹង bet)
+        let lastSharedWin = null;
+        function celebrateWin(totalWin, bet) {
+            // 🌟 ត្រឡប់ Promise ដែល resolve លុះត្រាតែ animation បញ្ចប់សព្វគ្រប់ —
+            // ដូច្នេះ Auto Spin (ដែល await celebrateWin() តាមរយៈ spin()) នឹងមិនចាប់ផ្តើម
+            // spin បន្ទាប់ ខណៈពេលផ្ទាំង Big Win / Mega Win នៅតែបង្ហាញនៅឡើយទេ។
+            return new Promise((resolveCelebration) => {
+                if (bet <= 0 || totalWin <= 0) return resolveCelebration();
+                const multiplier = totalWin / bet;
+                if (multiplier < 5) return resolveCelebration(); // ឈ្នះតូច - គ្មាន overlay ដូច្នេះ resolve ភ្លាមៗ
+
+                const isMega = multiplier >= 30;
+                const title = isMega ? 'MEGA WIN!' : (multiplier >= 10 ? 'ស៊ុមឈ្នះធំ!' : 'ឈ្នះល្អ!');
+                const overlay = document.getElementById('big-win-overlay');
+                const titleEl = document.getElementById('big-win-title');
+                const amountEl = document.getElementById('big-win-amount');
+
+                lastSharedWin = { title, amount: totalWin, multiplier: multiplier.toFixed(1) };
+
+                titleEl.innerText = title;
+                amountEl.innerText = '$0.00';
+                overlay.classList.add('show');
+                animateValue(amountEl, 0, totalWin, 1000);
+                spawnCoins(isMega ? 45 : 26);
+
+                if (isMega) {
+                    spawnConfetti(60);
+                    document.body.classList.add('screen-shake');
+                    setTimeout(() => document.body.classList.remove('screen-shake'), 400);
+                }
+
+                const duration = (isMega ? 3400 : 2400) * (turboMode ? 0.45 : 1); // 🌟 Turbo: celebration ខ្លីជាង
+                setTimeout(() => {
+                    overlay.classList.remove('show');
+                    resolveCelebration(); // 🌟 ត្រឹមនេះទើប animation ចប់ពិតប្រាកដ
+                }, duration);
+            });
+        }
+
+        // 🌟 Confetti piece rain សម្រាប់ MEGA WIN ប៉ុណ្ណោះ
+        function spawnConfetti(count) {
+            const container = document.getElementById('coin-container');
+            const colors = ['#ffd700', '#ff6b6b', '#2ecc71', '#2575fc', '#ff8c42', '#fff'];
+            for (let i = 0; i < count; i++) {
+                const piece = document.createElement('div');
+                piece.className = 'confetti-piece';
+                const size = 6 + Math.random() * 6;
+                piece.style.left = `${Math.random() * 100}%`;
+                piece.style.width = `${size}px`;
+                piece.style.height = `${size * 0.4}px`;
+                piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+                piece.style.animationDuration = `${1.6 + Math.random() * 1.4}s`;
+                piece.style.animationDelay = `${Math.random() * 0.5}s`;
+                container.appendChild(piece);
+                piece.addEventListener('animationend', () => piece.remove());
+            }
+        }
+
+        // 🌟 ចែករំលែកជ័យជម្នះ (Web Share API ជាមួយ fallback ចម្លងទៅ clipboard)
+        async function shareWin() {
+            if (!lastSharedWin) return;
+            const text = `🎰 ខ្ញុំទើបតែឈ្នះ $${lastSharedWin.amount.toFixed(2)} (x${lastSharedWin.multiplier}) នៅ Golden Dragon Fortune! ${lastSharedWin.title} 🔥`;
+            if (navigator.share) {
+                try { await navigator.share({ text }); } catch (err) { /* user cancelled */ }
+            } else if (navigator.clipboard) {
+                try {
+                    await navigator.clipboard.writeText(text);
+                    if (window.Swal) Swal.fire({ icon: 'success', title: 'ចម្លងរួចហើយ!', text: 'អត្ថបទជ័យជម្នះត្រូវបានចម្លងទៅ clipboard', confirmButtonColor: '#f39c12', timer: 1800, showConfirmButton: false });
+                } catch (err) { /* ignore */ }
+            }
+        }
+
+        function showError(message) {
+            if (window.Swal) {
+                Swal.fire({ icon: 'error', title: 'អូ!', text: message, confirmButtonColor: '#f39c12' });
+            } else {
+                alert(message);
+            }
+        }
+
+        // ==================== 🌟 Auto Spin ====================
+        function openAutoModal() {
+            if (isSpinning || autoSpinActive) return;
+            document.getElementById('auto-modal-overlay').classList.add('show');
+        }
+        function closeAutoModal() {
+            document.getElementById('auto-modal-overlay').classList.remove('show');
+        }
+
+        function onAutoBtnClick() {
+            if (autoSpinActive) {
+                stopAutoSpin('user');
+            } else {
+                openAutoModal();
+            }
+        }
+
+        function updateAutoBtnUI() {
+            const btn = document.getElementById('auto-btn');
+            const label = document.getElementById('auto-btn-label');
+            if (autoSpinActive) {
+                label.innerHTML = `ឈប់<span class="auto-sub">${autoSpinRemaining} នៅសល់</span>`;
+                btn.classList.add('active');
+            } else {
+                label.innerHTML = 'AUTO';
+                btn.classList.remove('active');
+            }
+        }
+
+        // 🌟 ហៅពេលចុចលេខនៅក្នុង Auto Modal (10/20/50/100)
+        async function startAutoSpin(count) {
+            closeAutoModal();
+            if (autoSpinActive || isSpinning) return;
+
+            // 🌟 អាន stop condition ពី input ២ ដែលមាននៅក្នុង Auto Modal (ទុកទទេ = គ្មានកំណត់)
+            const winInputVal = document.getElementById('auto-stop-win-input').value;
+            const balanceInputVal = document.getElementById('auto-stop-balance-input').value;
+            const autoStopWinAmount = winInputVal !== '' ? Number(winInputVal) : null;
+            const autoStopBalanceAmount = balanceInputVal !== '' ? Number(balanceInputVal) : null;
+
+            autoSpinActive = true;
+            autoSpinRemaining = count;
+            updateAutoBtnUI();
+
+            while (autoSpinActive && autoSpinRemaining > 0) {
+                if (userBalance < currentBet) {
+                    stopAutoSpin('balance');
+                    break;
+                }
+
+                await spin(); // 🌟 រង់ចាំ spin() resolve — spin() មិន resolve រហូតដល់ reel ចុងក្រោយ
+                              // ចុះចត និង win animation/celebration បានបញ្ចប់ទាំងស្រុងសិន
+
+                if (!autoSpinActive) break; // 🌟 ត្រូវបានបញ្ឈប់ខាងក្នុង spin() (error / ដល់ limit / សម្រាក)
+
+                // 🌟 បើ Bonus trigger បើក Pick-a-box, ត្រូវឈប់ Auto Spin ដើម្បីរង់ចាំអ្នកលេងជ្រើសរើសប្រអប់ដោយដៃ
+                if (pickBoxPending) {
+                    stopAutoSpin('bonus');
+                    break;
+                }
+
+                // 🌟 ត្រួតពិនិត្យលក្ខខណ្ឌ "ឈប់ពេលឈ្នះ" — ធ្វើបន្ទាប់ពី spin() resolve រួច
+                // (មានន័យថា animation នៃ spin ដែលទើបឈ្នះនោះ បានរត់ចប់សព្វគ្រប់ ថ្មប្រថប់ស្រាប់មិនកាត់ពាក់កណ្តាលទេ)
+                if (autoStopWinAmount !== null && lastSpinWin >= autoStopWinAmount) {
+                    stopAutoSpin('win_target');
+                    break;
+                }
+                if (autoStopBalanceAmount !== null && userBalance <= autoStopBalanceAmount) {
+                    stopAutoSpin('balance_target');
+                    break;
+                }
+
+                autoSpinRemaining--;
+                updateAutoBtnUI();
+
+                if (autoSpinRemaining <= 0) {
+                    stopAutoSpin('done');
+                    break;
+                }
+
+                await new Promise(resolve => setTimeout(resolve, getAutoSpinDelayMs()));
+            }
+
+            autoSpinActive = false;
+            updateAutoBtnUI();
+        }
+
+        function stopAutoSpin(reason) {
+            autoSpinActive = false;
+            autoSpinRemaining = 0;
+            updateAutoBtnUI();
+            document.getElementById('spin-btn').disabled = isSpinning;
+
+            if (reason === 'balance') {
+                showError('ប្រាក់មិនគ្រប់គ្រាន់ទេ! Auto Spin ត្រូវបានបញ្ឈប់។');
+            } else if (reason === 'win_target') {
+                showError(`🎉 អ្នកឈ្នះដល់ដែនកំណត់ដែលបានកំណត់ ($${lastSpinWin.toFixed(2)})! Auto Spin ត្រូវបានបញ្ឈប់។`);
+            } else if (reason === 'balance_target') {
+                showError('សមតុល្យធ្លាក់ដល់កម្រិតដែលបានកំណត់! Auto Spin ត្រូវបានបញ្ឈប់។');
+            }
+            // reason 'user' / 'done' / 'error' / 'break' / 'limit' / 'bonus' — មិនចាំបាច់ message បន្ថែមទេ (មានផ្សេងៗរាល់ខាងក្រៅរួចហើយ)
+        }
+
+        async function spin() {
+            if (isSpinning) return; // 🌟 ការពារចុច spin ច្រើនដងក្នុងពេលដំណាលគ្នា
+            if (pickBoxPending) return; // 🌟 ត្រូវជ្រើសរើសប្រអប់ Pick-a-box ជាមុនសិន
+            if (userBalance < currentBet) return showError("ប្រាក់មិនគ្រប់គ្រាន់ទេ!");
+
+            isSpinning = true;
+            document.getElementById('spin-btn').disabled = true;
+            document.getElementById('auto-btn').disabled = !autoSpinActive; // 🌟 អាចចុច "ឈប់" បានតែពេល auto spin កំពុងដំណើរការ
+            playSpinSound();
+            document.getElementById('win-line-canvas').innerHTML = ''; // លុបខ្សែ
+            document.querySelectorAll('.symbol-box').forEach(b => b.classList.remove('win-glow', 'near-miss-glow'));
+            document.querySelectorAll('.win-line-badge').forEach(b => b.remove());
+            document.getElementById('win-display').innerText = "$0.00";
+
+            // 🌟 ដកលុយបង្ហាញភ្លាមៗ (optimistic update) - នឹង rollback បើ server error
+            const balanceBeforeSpin = userBalance;
+            const betSnapshot = currentBet; // 🌟 ចាប់តម្លៃ bet ណាមួយប្រើសម្រាប់ spin នេះ ជាក់លាក់ (សម្រាប់ history)
+            userBalance -= currentBet;
+            document.getElementById('balance-display').innerText = `$${userBalance.toFixed(2)}`;
+
+            const reels = document.querySelectorAll('.reel');
+            reels.forEach(r => r.classList.add('spinning'));
+            document.getElementById('slot-grid').classList.add('active-spin');
+
+            const spinInterval = setInterval(() => {
+                reels.forEach((reel, idx) => {
+                    // 🌟 offset ល្បឿន cycle បន្តិចម្តងៗតាម reel index ដើម្បីកុំឱ្យទាំង 5 reel ប្តូររូបភាពដំណាលគ្នាបេះបិទ (មើលទៅ organic ជាង)
+                    if (Math.random() < 0.88 - idx * 0.03) {
+                        const imgs = reel.querySelectorAll('.symbol-img');
+                        imgs.forEach(img => {
+                            img.src = symbolImages[allSymbols[Math.floor(Math.random() * allSymbols.length)]];
+                            // 🌟 Retrigger animation "ធ្លាក់ចុះ" រាល់ដងផ្លាស់ប្តូររូបភាព
+                            img.classList.remove('symbol-cycle');
+                            void img.offsetWidth; // force reflow ដើម្បីអោយ animation ចាប់ផ្តើមឡើងវិញ
+                            img.classList.add('symbol-cycle');
+                        });
+                    }
+                });
+            }, getSpinCycleMs());
+
+            try {
+                const response = await fetch(`${API_URL}/spin`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: userData.id, bet_amount: currentBet, user_name: userData.first_name, init_data: userData.initData })
+                });
+                const data = await response.json();
+
+                // 🌟 Backend ថ្មីប្រើ HTTPException (status != 2xx) សម្រាប់ error ជំនួស status:"error"
+                if (!response.ok) {
+                    const err = new Error(data.detail || "មានបញ្ហាកើតឡើង, សូមព្យាយាមម្តងទៀត");
+                    err.status = response.status;
+                    throw err;
+                }
+
+                clearInterval(spinInterval);
+
+                lastSpinWin = data.total_win || 0; // 🌟 រក្សាទុកសម្រាប់ auto-stop-on-win (ត្រួតពិនិត្យក្រោយ animation ចប់)
+                // 🌟 កត់ត្រាទុកក្នុងប្រវត្តិ Spin — Free Spin មិនកាត់ប្រាក់ទេ ដូច្នេះកត់ bet ជា $0
+                recordSpinHistory(data.is_free_spin ? 0 : betSnapshot, data.total_win || 0);
+
+                await new Promise(resolve => {
+                    data.grid.forEach((reelSymbols, reelIndex) => {
+                        setTimeout(() => {
+                            const reelDiv = document.getElementById(`reel-${reelIndex}`);
+                            reelDiv.classList.remove('spinning');
+                            reelDiv.innerHTML = '';
+
+                            reelSymbols.forEach((symbol, rowIndex) => {
+                                const box = document.createElement('div');
+                                box.className = 'symbol-box' + (symbol === 'WILD' ? ' is-wild' : ''); // 🌟 glow អចិន្ត្រៃយ៍សម្រាប់ WILD
+                                box.id = `box-${reelIndex}-${rowIndex}`; // ចង ID ថ្មី
+                                box.innerHTML = `<img class="symbol-img" src="${symbolImages[symbol]}">`;
+                                reelDiv.appendChild(box);
+                            });
+
+                            // 🌟 Effect ធាក់បន្តិចពេល reel ឈប់ + សំឡេង reel stop
+                            reelDiv.classList.add('reel-landed');
+                            playReelStopSound();
+                            setTimeout(() => reelDiv.classList.remove('reel-landed'), 250);
+
+                            if (reelIndex === 4) { // រ៉ូឡូទី ៥ ឈប់
+                                document.getElementById('slot-grid').classList.remove('active-spin');
+                                const prevDisplayedBalance = userBalance;
+                                userBalance = data.balance;
+                                animateValue(document.getElementById('balance-display'), prevDisplayedBalance, userBalance, 600);
+
+                                updateSessionBadge(data);
+                                updateStreakBadge(data);
+                                updateFreeSpinBanner(data);
+                                showBadgeToast(data.new_badges);
+
+                                // 🌟 Bonus trigger (BONUS symbol >= 3) — បើក Pick-a-box mini game
+                                if (data.bonus_triggered && data.pick_box) {
+                                    setTimeout(() => openPickBoxModal(data.pick_box), 900);
+                                }
+
+                                // 🌟 resolve() ត្រូវហៅតែម្តងគត់ ក្រោយពេលអ្វីៗ (រួមទាំង Big Win overlay
+                                // ប្រសិនបើមាន) បានបញ្ចប់ទាំងស្រុង — ដូច្នេះ Auto Spin (ដែល await spin())
+                                // នឹងមិនចាប់ផ្តើម spin បន្ទាប់ ខណៈពេលផ្ទាំង Celebration នៅតែបង្ហាញនៅឡើយទេ។
+                                const finishSpin = () => {
+                                    if (data.take_a_break) {
+                                        if (autoSpinActive) stopAutoSpin('break'); // 🌟 បញ្ឈប់ Auto Spin ដើម្បីលើកទឹកចិត្តឱ្យសម្រាកមែនទែន
+                                        setTimeout(() => showBreakReminder(data.spins_today), 1600);
+                                    }
+                                    resolve();
+                                };
+
+                                if (data.winning_lines && data.winning_lines.length > 0) {
+                                    animateValue(document.getElementById('win-display'), 0, data.total_win, 700);
+                                    // 🌟 ហៅ Function គូរខ្សែរត់
+                                    drawWinningLines(data.winning_lines);
+                                    // 🌟 បង្ហាញ glow ពិសេសពេលជិតដល់ 5-of-a-kind
+                                    checkNearMiss(data.winning_lines);
+
+                                    const multiplier = data.total_win / currentBet;
+                                    const tier = multiplier >= 30 ? 'mega' : (multiplier >= 10 ? 'big' : 'small');
+                                    playWinSound(tier);
+                                    // 🌟 ប្រសិនបើឈ្នះធំធៀបនឹង bet - បង្ហាញ celebration ហើយ *រង់ចាំ* វាបញ្ចប់សិន
+                                    celebrateWin(data.total_win, currentBet).then(finishSpin);
+                                } else {
+                                    finishSpin();
+                                }
+                            }
+                        }, reelIndex * getReelStaggerMs());
+                    });
+                });
+
+            } catch (err) {
+                console.error(err);
+                clearInterval(spinInterval);
+                stopReelsSpinning();
+                userBalance = balanceBeforeSpin; // 🌟 rollback optimistic deduction
+                document.getElementById('balance-display').innerText = `$${userBalance.toFixed(2)}`;
+                playErrorSound();
+                const wasAutoSpinning = autoSpinActive;
+                if (wasAutoSpinning) stopAutoSpin(err.status === 429 ? 'limit' : 'error'); // 🌟 បញ្ឈប់ Auto Spin ភ្លាមៗពេលមានបញ្ហា
+                if (err.status === 429) {
+                    showDailyLimitReached();
+                } else {
+                    showError(err.message || "មិនអាចភ្ជាប់ទៅ server បានទេ");
+                }
+                await syncBalance(); // 🌟 ធានាថា balance ត្រឹមត្រូវទៅតាម server ជានិច្ច
+            } finally {
+                isSpinning = false;
+                // 🌟 បើ auto spin កំពុងបន្ត ទុក spin-btn ឱ្យនៅតែបិទដដែល ការពារចុចទាំសង្ស័យខណៈកំពុងសម្រាករវាងវគ្គ
+                document.getElementById('spin-btn').disabled = autoSpinActive;
+                document.getElementById('auto-btn').disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
