@@ -34,6 +34,20 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+@app.get("/")
+def read_root():
+    """🌟 Root path — ដើម្បីកុំឱ្យបង្ហាញ 'Not Found' ទទេ ពេលនរណាម្នាក់បើក domain ដោយផ្ទាល់
+    (ឧ. ពិនិត្យមើលថា Backend Deploy ជោគជ័យឬអត់)។ នេះមិនមែនជា frontend ទេ — Frontend
+    ត្រូវ Deploy ដាច់ដោយឡែក (Netlify/Vercel/GitHub Pages) ហើយហៅមកកាន់ endpoint /api/... ទាំងនេះ។
+    """
+    return {
+        "status": "ok",
+        "service": "Golden Dragon Fortune API",
+        "docs": "/docs",
+        "game_info": "/api/game-info",
+    }
+
 # --- ធ្នឹមអាជីវកម្មរបស់ហ្គេម (constants) ---
 # ដាក់នៅ module-level ព្រោះមិនប្រែប្រួលទៅតាម request/bet_amount ទេ
 # ដូច្នេះមិនចាំបាច់ស្ថាបនា engine ថ្មីរាល់ spin
